@@ -3,6 +3,7 @@
 
 import sys
 import argparse
+from coral import instantiate
 
 def show_help():
     """Print Cocotb test runner help and exit."""
@@ -24,9 +25,12 @@ def main():
 
     parser = argparse.ArgumentParser(
             prog="coral",
-            description="SHARC RTL verification tool 'Coral' "
+            description="SHARC RTL Verification Tool: 'Coral' " \
+            "Generate Simple Verilog Testbenches for modules." \
+            "Generate a scaffold for a cocotb test with a single command." \
+            "Run tests and regressions" \
         )
-
+    
     # Create subcommand manager
     subparsers = parser.add_subparsers(dest="command", required=True)
     
@@ -39,7 +43,7 @@ def main():
     sim_parser.add_argument("--all", "-a", type=int, default=1,
                         help="Number of all tests")
     
-    sim_parser.add_argument("pattern", "-p", type=int, default=1,
+    sim_parser.add_argument("--pattern", "-p", type=int, default=1,
                         help="Number of all tests")
     
     sim_parser.add_argument("--tests", "-t", type=int, default=1,
@@ -57,37 +61,39 @@ def main():
 
 
     # Parsing the REGRESS command
-    sim_parser = subparsers.add_parser(
+    regress_parser = subparsers.add_parser(
         "regress",
-        help="Run a single test, optionally specifying a specific test."
+        help="Run a test regression of a specific testlist"
     )
     
-    sim_parser.add_argument("--testlist", "-t", type=int, default=1,
+    regress_parser.add_argument("--testlist", "-t", type=str, default="sanity",
                         help="specify a testlist file")
     
-    sim_parser.add_argument("--iterations", "-i", type=int, default=1,
+    regress_parser.add_argument("--iterations", "-i", type=int, default=1,
                         help="Number of times to run the testlist")
-
-    sim_parser.add_argument("--r", "-s", type=int,
-                        help="Repeat the last regression a specific seed")
     
-    sim_parser.add_argument("--verbose", "-v",
+    regress_parser.add_argument("--verbose", "-v",
                         action="store_true",
                         help="Enable verbose output")
+
+    # Parsing the TB-SETUP command
+    clean_parser = subparsers.add_parser(
+        "tb-setup",
+        help="Create a testbench from the RTL source."
+    )
     
-    parser.add_argument("clean",
-                    action="store_true",
-                    help="Clean output directory before running tests.")
-    
-    parser.add_argument("--verbose", "-v",
-                    action="store_true",
-                    help="Enable verbose output")
+    # Parsing the CLEAN command
+    clean_parser = subparsers.add_parser(
+        "clean",
+        help="Run a single test, optionally specifying a specific test."
+    )
 
     args = parser.parse_args()
+    print("[DEBUG]", args)
 
-    print("Verbose:", args.verbose)
-    print("Runs:", args.runs)
-    print("Seed:", args.seed)
+
+    if args.command == "tb-setup":
+        instantiate
 
 
 if __name__ == "__main__":

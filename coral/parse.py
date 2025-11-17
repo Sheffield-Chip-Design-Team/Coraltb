@@ -1,5 +1,4 @@
 # Convenience functions for handling and parsing verilog source files
-import argparse
 from pyverilog.vparser.parser import parse
 from pyverilog.ast_code_generator.codegen import ASTCodeGenerator
 import sys, os

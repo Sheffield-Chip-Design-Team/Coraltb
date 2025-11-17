@@ -1,0 +1,26 @@
+Metadata-Version: 2.4
+Name: Coraltb
+Version: 0.0.1
+Summary: Cocotb-based test creation and simulation running utilities
+Author-email: James Ashie Kotey <jashiekotey1@sheffield.ac.uk>
+License: apache 2.0
+Project-URL: Homepage, https://github.com/your_username/Coraltb
+Project-URL: Repository, https://github.com/your_username/your_project_name
+Project-URL: Documentation, https://your_project_name.readthedocs.io/
+Keywords: rtl-verification,automation,python
+Classifier: Programming Language :: Python :: 3
+Classifier: License :: OSI Approved :: MIT License
+Classifier: Operating System :: OS Independent
+Requires-Python: >=3.12
+Description-Content-Type: text/markdown
+License-File: LICENSE
+Requires-Dist: cocotb>=1.8.3
+Requires-Dist: cocotb-coverage
+Requires-Dist: pytest
+Requires-Dist: pyverilog
+Provides-Extra: dev
+Requires-Dist: flake8; extra == "dev"
+Requires-Dist: black; extra == "dev"
+Dynamic: license-file
+
+# TODO: Populate the README

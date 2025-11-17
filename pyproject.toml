@@ -12,7 +12,7 @@ license = { file = "LICENSE" }
 authors = [
     {name = "James Ashie Kotey", email = "jashiekotey1@sheffield.ac.uk" },
 ]
-keywords = ["python", "template", "example"]
+keywords = ["rtl-verification", "automation", "python"]
 classifiers = [
     "Programming Language :: Python :: 3",
     "License :: OSI Approved :: MIT License",
@@ -20,7 +20,9 @@ classifiers = [
 ]
 dependencies = [
     "cocotb>=1.8.3",
+    "cocotb-coverage",
     "pytest",
+    "pyverilog"
 ]
 
 [project.optional-dependencies]
@@ -30,12 +32,12 @@ dev = [
 ]
 
 [project.urls]
-Homepage = "https://github.com/your_username/your_project_name"
+Homepage = "https://github.com/your_username/Coraltb"
 Repository = "https://github.com/your_username/your_project_name"
 Documentation = "https://your_project_name.readthedocs.io/"
 
 [tool.setuptools]
-packages = ["your_project_name"] # Or find: "src" if using src layout
+packages = ["coral"] 
 
 [tool.black]
 line-length = 88
@@ -45,5 +47,5 @@ target-version = ['py38', 'py39', 'py310', 'py311']
 min_version = "6.0"
 addopts = "--strict-markers --strict-positions"
 testpaths = [
-    "tests",
+    "test",
 ]
