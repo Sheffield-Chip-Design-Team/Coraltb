@@ -1,0 +1,49 @@
+[build-system]
+requires = ["setuptools>=61.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "Coraltb"
+version = "0.0.1"
+description = "Cocotb-based test creation and simulation running utilities"
+readme = "README.md"
+requires-python = ">=3.12"
+license = { file = "LICENSE" }
+authors = [
+    {name = "James Ashie Kotey", email = "jashiekotey1@sheffield.ac.uk" },
+]
+keywords = ["python", "template", "example"]
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: OS Independent",
+]
+dependencies = [
+    "cocotb>=1.8.3",
+    "pytest",
+]
+
+[project.optional-dependencies]
+dev = [
+    "flake8",
+    "black",
+]
+
+[project.urls]
+Homepage = "https://github.com/your_username/your_project_name"
+Repository = "https://github.com/your_username/your_project_name"
+Documentation = "https://your_project_name.readthedocs.io/"
+
+[tool.setuptools]
+packages = ["your_project_name"] # Or find: "src" if using src layout
+
+[tool.black]
+line-length = 88
+target-version = ['py38', 'py39', 'py310', 'py311']
+
+[tool.pytest.ini_options]
+min_version = "6.0"
+addopts = "--strict-markers --strict-positions"
+testpaths = [
+    "tests",
+]
