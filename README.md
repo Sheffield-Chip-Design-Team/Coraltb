@@ -11,10 +11,10 @@ cd Coraltb
 
 ### 2. Create and activate a virtual environment
 ```
-python -m venv .venv
-source .venv/bin/activate        # Linux / macOS
+python -m venv .env
+source .env/bin/activate        # Linux / macOS
 # or
-.\.venv\Scripts\activate         # Windows
+.\.env\Scripts\activate         # Windows
 ```
 
 ### 3. Install the package as editable
