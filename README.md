@@ -1,1 +1,28 @@
-# TODO: Populate the README
+# Coraltb 
+
+## Cloning and Installing the Coraltb Package (Editable Mode)
+Follow the steps below to clone this repository and install the package in editable mode for development.
+
+### 1. Clone the Repository
+```bash
+git clone [https://github.com/your-username/your-repo.git](https://github.com/Sheffield-Chip-Design-Team/Coraltb.git) Coraltb
+cd Coraltb
+```
+
+### 2. Create and activate a virtual environment
+```
+python -m venv .venv
+source .venv/bin/activate        # Linux / macOS
+# or
+.\.venv\Scripts\activate         # Windows
+```
+
+### 3. Install the package as editable
+```bash
+pip install -e .
+```
+
+### 4 Read the help command
+```bash
+coral -h
+```
