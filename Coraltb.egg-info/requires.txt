@@ -1,8 +1,0 @@
-cocotb>=1.8.3
-cocotb-coverage
-pytest
-pyverilog
-
-[dev]
-flake8
-black
