@@ -36,8 +36,12 @@ Homepage = "https://github.com/your_username/Coraltb"
 Repository = "https://github.com/your_username/your_project_name"
 Documentation = "https://your_project_name.readthedocs.io/"
 
+
+[project.scripts]
+coral  = "apps.coral:main"
+
 [tool.setuptools]
-packages = ["coral"] 
+packages = ["coral", "apps"] 
 
 [tool.black]
 line-length = 88

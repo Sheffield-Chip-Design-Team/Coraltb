@@ -77,10 +77,13 @@ def main():
                         help="Enable verbose output")
 
     # Parsing the TB-SETUP command
-    clean_parser = subparsers.add_parser(
-        "tb-setup",
-        help="Create a testbench from the RTL source."
+    setup_parser = subparsers.add_parser(
+        "code-gen",
+        help="Create a verilog or cocotb testbench from RTL sources."
     )
+    
+    setup_parser.add_argument("--src", "-s", nargs='+', type=str, required=True,
+                        help="List of Verilog soruce file(s).")
     
     # Parsing the CLEAN command
     clean_parser = subparsers.add_parser(
@@ -91,9 +94,8 @@ def main():
     args = parser.parse_args()
     print("[DEBUG]", args)
 
-
-    if args.command == "tb-setup":
-        instantiate
+    if args.command == "code-gen":
+        instantiate.parse_files(args.src)
 
 
 if __name__ == "__main__":
