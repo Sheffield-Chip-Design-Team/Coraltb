@@ -24,7 +24,7 @@ or for Windows...
 pip install -e .
 ```
 
-### 4 Read the help command
+### 4 Run the help command
 ```bash
 coral -h
 ```
