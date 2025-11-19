@@ -14,7 +14,7 @@ cd Coraltb
 python -m venv .env
 source .env/bin/activate        # Linux / macOS
 ```
-or
+or for Windows...
 ```
 .\.env\Scripts\activate         # Windows
 ```
