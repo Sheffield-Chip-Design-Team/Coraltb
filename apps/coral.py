@@ -5,27 +5,11 @@ import sys
 import argparse
 from coral import instantiate
 
-def show_help():
-    """Print Cocotb test runner help and exit."""
-    print()
-    print("Cocotb Test Runner Script")
-    print("James Ashie Kotey - SHaRC 2025")
-    print("Usage:")
-    print("coral regress --runs or -r <iterations> --width or -w <test_width> [other options]")
-    print("coral sim [--tb or -t=<testbench_name>] [other options]")
-    print("coral --help or -h")
-    print()
-    print("Commands:")
-    print("  regress   Run regression tests with specified options.")
-    print("  sim       Run a simulation, optionally with a testbench.")
-    print("  help      Show this help message.")
-    sys.exit(0)
-
 def main():
 
     parser = argparse.ArgumentParser(
             prog="coral",
-            description="SHARC RTL Verification Tool: 'Coral' " \
+            description="SHARC Verification Tool: 'Coraltb' " \
             "Generate Simple Verilog Testbenches for modules." \
             "Generate a scaffold for a cocotb test with a single command." \
             "Run tests and regressions" \
@@ -76,13 +60,25 @@ def main():
                         help="Enable verbose output")
 
     # Parsing the TB-SETUP command
-    setup_parser = subparsers.add_parser(
+    code_gen_parser = subparsers.add_parser(
         "code-gen",
         help="Create a verilog or cocotb testbench from RTL sources. [PARTIALLY IMPLEMENTED]"
     )
+        
+    code_gen_parser.add_argument("--verbose", "-v", required=False, default=False,
+                        action="store_true",
+                        help="Name of the output file (without a file extension)")
     
-    setup_parser.add_argument("--src", "-s", nargs='+', type=str, required=True,
+    code_gen_parser.add_argument("--src", "-s", nargs='+', type=str, required=True,
                         help="List of Verilog soruce file(s).")
+    
+    code_gen_parser.add_argument("--verilog-wrap", "-w", required=False, default=False,
+                        action="store_true",
+                        help="Enable generation of a Verilog testbench wrapper.")
+    
+    code_gen_parser.add_argument("--cocotb-test", "-t", required=False, default=True,
+                        action="store_true",
+                        help="Enable generation of a Cocotb heartbeat test template with clock and reset.")
     
     # Parsing the CLEAN command
     clean_parser = subparsers.add_parser(
