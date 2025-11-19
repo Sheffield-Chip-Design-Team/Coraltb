@@ -37,7 +37,7 @@ def main():
     # Parsing the SIM command
     sim_parser = subparsers.add_parser(
         "sim",
-        help="Run a single test, optionally specifying a specific test."
+        help="Run a single test, optionally specifying a specific test. [UNIMPLEMENTED]"
     )
     
     sim_parser.add_argument("--all", "-a", type=int, default=1,
@@ -59,11 +59,10 @@ def main():
                         action="store_true",
                         help="Enable verbose output")
 
-
     # Parsing the REGRESS command
     regress_parser = subparsers.add_parser(
         "regress",
-        help="Run a test regression of a specific testlist"
+        help="Run a test regression of a specific testlist [UNIMPLEMENTED]"
     )
     
     regress_parser.add_argument("--testlist", "-t", type=str, default="sanity",
@@ -79,7 +78,7 @@ def main():
     # Parsing the TB-SETUP command
     setup_parser = subparsers.add_parser(
         "code-gen",
-        help="Create a verilog or cocotb testbench from RTL sources."
+        help="Create a verilog or cocotb testbench from RTL sources. [PARTIALLY IMPLEMENTED]"
     )
     
     setup_parser.add_argument("--src", "-s", nargs='+', type=str, required=True,
@@ -88,7 +87,7 @@ def main():
     # Parsing the CLEAN command
     clean_parser = subparsers.add_parser(
         "clean",
-        help="Run a single test, optionally specifying a specific test."
+        help="Run a single test, optionally specifying a specific test. [UNIMPLEMENTED]"
     )
 
     args = parser.parse_args()
