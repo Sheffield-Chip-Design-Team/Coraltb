@@ -7,6 +7,11 @@ import sys, os , io
 
 codegen = ASTCodeGenerator()
 
+# TODO - refactor generate instantiation 
+# TODO - add config option for keeping parameter definitions in instantiations
+# TODO - fix extraction port widths defined by parameters (and overriden parameters)
+# TODO - add support for inout ports
+
 def parse_design (filelist, includes, defines):
     """Parse the verilog design files and return (ast, directives)."""
     for f in filelist:
