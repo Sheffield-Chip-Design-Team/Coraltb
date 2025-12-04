@@ -46,14 +46,16 @@ def get_ports(ast):
             ports.append(p)
     return ports
     
-def create_io_port_dict(ports):
-    """Return a dict of port_name -> port direction."""
+def create_io_port_dict(ports, params):
+    """Return a dict of port_name -> [port direction, port width]."""
     port_dict = {}
     for p in ports:
         # Ports can be Ioport or simple Identifier
         if isinstance(p, Ioport):
             pname = p.first.name    # e.g. 'clk'
-            port_dict[pname] = get_port_direction(p)
+            port_dict[pname] = []
+            port_dict[pname].append(get_port_direction(p))
+            port_dict[pname].append(get_port_width(p, params))
         elif isinstance(p, Identifier):
             pname = p.name
         else:
@@ -64,7 +66,7 @@ def create_io_port_dict(ports):
 def get_port_direction(port):
     """Return the direction of an Ioport ('input', 'output', 'inout')."""
     if isinstance(port, Ioport):
-        print(f"[DEBUG] Getting direction for port {port.first.name}")
+        # print(f"[DEBUG] Getting direction for port {port.first.name}")
         first = port.first
         if isinstance(first, Input):
             return "input"
@@ -73,6 +75,22 @@ def get_port_direction(port):
         elif isinstance(first, Inout):
             return "inout"
     return None
+
+def get_port_width(port, params):
+    """
+    Return integer width of a PyVerilog Input/Output/Inout node.
+    Returns 1 for scalar (no width declared).
+    """
+    w = port.first.width
+    if w is None:
+        return 1  # scalar wire
+
+    # w.msb and w.lsb are AST nodes (usually IntConst)
+    print(f"DEBUG: port width for {port.first.name} is {codegen.visit(w)}")
+    
+    # todo: pull out parameters ???
+
+    return 10
 
 def get_body_parameters(ast):
     """Return a list of body parameter AST nodes."""
@@ -99,87 +117,137 @@ def get_body_param_info(param):
 
     return name, value
 
+def get_header_param_info(param):
+    """Return (name, default_value_str)."""
+    name = param.list[0].name
+
+    # param.value is an AST node (IntConst, Identifier, BinaryOp, etc.)
+    if param.list[0].value is None:
+        value = None
+    else:
+        value = str(codegen.visit(param.list[0].value))  # <-- converts AST to string
+
+    return name, value
+
 def get_header_parameters(ast):
     """Return a list of header parameter AST nodes."""
     params = [] 
     # header parameters 
     if isinstance(ast.paramlist, Paramlist) and ast.paramlist.params:
         for p in ast.paramlist.params:
+            print(f"[DEBUG] Found header parameter {p.list[0].name}")
             params.append(p)
 
     return params
 
-def generate_instantiation (ast, top_module, inst_name, overide_params=[], param_values=[], heirarchal=False):
+def generate_instantiation (ast, top_module, inst_name, overide_params=[], param_values=[], heirarchal=False, keep_params=False):
     """Generate a verilog instantiation string for a module in the AST."""
 
-    if not heirarchal: # just instantiate the top module
-       
-        for desc in ast.description.definitions:
-            if isinstance(desc, ModuleDef) and desc.name == top_module:
-                mod = desc
+    mods = []
 
-    top_str = codegen.visit(mod)
-    print("[DEBUG] Parsed the top module")
-    print(top_str)
+    for desc in ast.description.definitions:
+        if isinstance(desc, ModuleDef):
+            if not heirarchal:
+                if desc.name == top_module:
+                    mods.append(desc)
+            else:
+                mods.append(desc)
+            print(f"[DEBUG] found module {desc.name}.")
 
-    # PARAMETERS 
-    param_objects = []
-    param_objects = get_body_parameters(mod)
-    params = {}
-    for p in param_objects:
-        name, value = get_body_param_info(p)
-        print(f"[DEBUG] Found parameter {name} with default value {value}")
-        params[name] = value
+        if (len(mods) == 0 and not heirarchal):
+            print(f"[ERROR] Top module {top_module} not found in design")
+            return
+
+    for mod in mods:
     
-    # override params
-    if overide_params and param_values:
-        for i in range (len(overide_params)):
-            print(f"[DEBUG] Overriding parameter {overide_params[i].upper()} with value {param_values[i]}")
-            if overide_params[i].upper() in params or overide_params[i].lower() in params:
-                params[overide_params[i].upper()] = param_values[i]
-            else :
-                print(f"[WARNING] Parameter {overide_params[i]} not found in module {mod.name}, skipping override")
+        top_str = codegen.visit(mod)
+        print(f"[DEBUG] Parsed module {mod.name}")
+        # print(top_str)
 
-    # PORTS 
-    ports = {}
-    ports = create_io_port_dict(get_ports(mod))
+        # PARAMETERS 
 
-    # BUILD STRING
-    out = []
+        # todo refactor this into one function
+        body_params = []
+        body_params = get_body_parameters(mod)
 
-    # declare interface signals
-    for name, direction in ports.items():
-        signal_name = name.upper()
-        print(f"[DEBUG] Port {signal_name} is a {direction}")
-        if direction == "input":
-            out.append(f"reg {signal_name};")
-        elif direction == "output": 
-            out.append(f"wire {signal_name};")
+        header_params = []
+        header_params = get_header_parameters(mod)
 
-    out.append("")
+        params = {}
+        
+        for b in body_params:
+            name, value = get_body_param_info(b)
+            print(f"[DEBUG] Found parameter {name} with default value {value}")
+            params[name] = value
 
-    # module name + parameters
-    if params:
-        out.append(f"{mod.name} #(")
-        for i, c in enumerate(params):
-            comma = "," if i < len(params) - 1 else ""
-            out.append(f"    .{c}({params[c]}) {comma}")
-        out.append(f") {inst_name} (")
-    else:
-        out.append(f"{mod.name} {inst_name} (")
-   
-    # ports
-    for i, c in enumerate(ports):
-        comma = "," if i < len(ports) - 1 else ""
-        out.append(f"    .{c}({c.upper()}){comma}")
+        for h in header_params:
+            name, value = get_header_param_info(h)
+            print(f"[DEBUG] Found parameter {name} with default value {value}")
+            params[name] = value
+        
+        # override params
+        if overide_params and param_values:
+            for i in range (len(overide_params)):
+                print(f"[DEBUG] Overriding parameter {overide_params[i].upper()} with value {param_values[i]}")
+                if overide_params[i].upper() in params or overide_params[i].lower() in params:
+                    params[overide_params[i].upper()] = param_values[i]
+                else :
+                    print(f"[WARNING] Parameter {overide_params[i]} not found in module {mod.name}, skipping override")
 
-    out.append(");")
+        # PORTS 
+        ports = {}
+        ports = create_io_port_dict(get_ports(mod), params)
 
-    print("[DEBUG] Generated instantiation for the top module \n")
+        # BUILD STRING
+        out = []
 
-    # TODO write to file instead of printing
-    print("\n".join(out))
+        # declare interface signals
+        # todo: handle widths and inouts
 
+        # net type
+        for name, info in ports.items():
+            decl_str = ""
+            signal_name = name.upper()
+            print(f"[DEBUG] Port {signal_name} is a {info[0]}")
+
+            #  direction
+            if (info[0] == "input"):
+                decl_str += (f"reg  ")
+            elif (info[0] == "output"): 
+                 decl_str += (f"wire ")
+
+            # net width 
+            if info[1] != 1: 
+                decl_str += (f"[{int(info[1])-1}:0]")
+
+            decl_str += (f" {signal_name};")
+            out.append(decl_str)
+        
+        out.append("")  # blank line
+
+        # module name + parameters
+        if params:
+            out.append(f"{mod.name} #(")
+            for i, c in enumerate(params):
+                comma = "," if i < len(params) - 1 else ""
+                out.append(f"    .{c}({params[c]}){comma}")
+            out.append(f") {inst_name} (")
+        else:
+            out.append(f"{mod.name} {inst_name} (")
+    
+        # ports
+        for i, c in enumerate(ports):
+            comma = "," if i < len(ports) - 1 else ""
+            out.append(f"    .{c}({c.upper()}){comma}")
+
+        out.append(");")
+
+        print("[DEBUG] Generated instantiation! \n")
+
+        # TODO write to file instead of printing
+        print("\n".join(out))
+        print(" ")
+        
 def cleanup_pyverilog_artifacts():
     for junk in ["parser.out", "parsetab.py", "parsetab.pyc"]:
         try:
