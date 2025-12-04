@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 import argparse
-from parse import *
+from coral.verilog import *
 
 def generate_cocotb_test(module_name, ports, test_name):
     clk_signal = next((p[2] for p in ports if any(x in p[2].lower() for x in ['clk', 'clock'])), None)

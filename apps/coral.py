@@ -3,7 +3,7 @@
 
 import sys
 import argparse
-from coral import instantiate
+from coral import instantiate, verilog
 
 def main():
 
@@ -67,10 +67,16 @@ def main():
         
     code_gen_parser.add_argument("--verbose", "-v", required=False, default=False,
                         action="store_true",
-                        help="Name of the output file (without a file extension)")
+                        help="Enable verbose output.")
     
     code_gen_parser.add_argument("--src", "-s", nargs='+', type=str, required=True,
                         help="List of Verilog soruce file(s).")
+    
+    code_gen_parser.add_argument("--includes", "-I", nargs='+', type=str, required=False,
+                        help="List of include files or directories.")
+
+    code_gen_parser.add_argument("--defines", "-D", nargs='+', type=str, required=False,
+    help="List of parameter defines.")
     
     code_gen_parser.add_argument("--verilog-wrap", "-w", required=False, default=False,
                         action="store_true",
@@ -80,6 +86,9 @@ def main():
                         action="store_true",
                         help="Enable generation of a Cocotb heartbeat test template with clock and reset.")
     
+    code_gen_parser.add_argument("--param", "-p", nargs="*", help="Verilog-style +args")
+
+
     # Parsing the CLEAN command
     clean_parser = subparsers.add_parser(
         "clean",
@@ -87,11 +96,23 @@ def main():
     )
 
     args = parser.parse_args()
+
     print("[DEBUG]", args)
 
     if args.command == "code-gen":
-        instantiate.parse_files(args.src)
+        ast, directives = verilog.parse_design(args.src, args.includes, args.defines)
+        
+        param_list = []
+        param_overrides = []
 
+        for param in args.param:
+            if '=' in param:
+                pname, pvalue = param.split('=')
+                pname = pname.lstrip("+")
+                param_list.append(pname)
+                param_overrides.append(pvalue)
+
+        verilog.generate_instantiation(ast, "adder" , "dut", param_list , param_overrides, heirarchal=False)
 
 if __name__ == "__main__":
     main()
