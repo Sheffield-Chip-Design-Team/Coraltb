@@ -59,7 +59,9 @@ def main():
                         action="store_true",
                         help="Enable verbose output")
 
-    # Parsing the TB-SETUP command
+    # Parsing the code-gen command
+    # -- todo: separate this out into a different file
+
     code_gen_parser = subparsers.add_parser(
         "code-gen",
         help="Create a verilog or cocotb testbench from RTL sources. [PARTIALLY IMPLEMENTED]"
@@ -82,12 +84,15 @@ def main():
                         action="store_true",
                         help="Enable generation of a Verilog testbench wrapper.")
     
-    code_gen_parser.add_argument("--cocotb-test", "-t", required=False, default=True,
+    code_gen_parser.add_argument("--cocotb-test", "-c", required=False, default=True,
                         action="store_true",
                         help="Enable generation of a Cocotb heartbeat test template with clock and reset.")
     
     code_gen_parser.add_argument("--param", "-p", nargs="*", help="Verilog-style +args")
 
+    code_gen_parser.add_argument("--top", "-t", type=str, required=True, help="top module name")
+
+    code_gen_parser.add_argument("--heir", "-H", required=False, default=True,  action="store_true", help="instantiate the module heirarchally")
 
     # Parsing the CLEAN command
     clean_parser = subparsers.add_parser(
@@ -105,14 +110,16 @@ def main():
         param_list = []
         param_overrides = []
 
-        for param in args.param:
-            if '=' in param:
-                pname, pvalue = param.split('=')
-                pname = pname.lstrip("+")
-                param_list.append(pname)
-                param_overrides.append(pvalue)
+        if args.param is not None:
+            for param in args.param:
+                if '=' in param:
+                    pname, pvalue = param.split('=')
+                    pname = pname.lstrip("+")
+                    param_list.append(pname)
+                    param_overrides.append(pvalue)
 
-        verilog.generate_instantiation(ast, "adder" , "dut", param_list , param_overrides, heirarchal=False)
+        verilog.generate_instantiation(ast, args.top , "dut" , param_list , param_overrides, heirarchal=args.heir==True)
+        verilog.cleanup_pyverilog_artifacts()
 
 if __name__ == "__main__":
     main()
