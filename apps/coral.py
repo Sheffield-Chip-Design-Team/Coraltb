@@ -3,7 +3,9 @@
 
 import sys
 import argparse
-from coral import verilog_wtb, python_tb
+
+from coral.codegen import verilog_wtb
+from coral.codegen import python_tb
 from coral.common import pyverilog_helpers
 
 def main():
