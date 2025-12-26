@@ -59,48 +59,48 @@ async def test_{sanity_name}_sanity(uut):
 
 if __name__ == "__main__":
     
-    parser = argparse.ArgumentParser(description="Generate cocotb test templates.")
-    parser.add_argument("verilog_files", nargs="+", help="List of Verilog files")
-    parser.add_argument("-name", type=str, default=None, help="Custom test filename")
-    args = parser.parse_args()
+    # parser = argparse.ArgumentParser(description="Generate cocotb test templates.")
+    # parser.add_argument("verilog_files", nargs="+", help="List of Verilog files")
+    # parser.add_argument("-name", type=str, default=None, help="Custom test filename")
+    # args = parser.parse_args()
 
-    if len(sys.argv) < 2:
-        print("Usage: python3 instantiate.py <verilog_files> [-name=<test_name>]")
-        sys.exit(1)
+    # if len(sys.argv) < 2:
+    #     print("Usage: python3 instantiate.py <verilog_files> [-name=<test_name>]")
+    #     sys.exit(1)
 
-    all_args = " ".join(sys.argv[1:])
+    # all_args = " ".join(sys.argv[1:])
    
-    # Filter out any -name argument and its value
-    filtered_args = []
-    skip_next = False
-    for arg in all_args.split():
-        if arg.startswith("-name"):
-            skip_next = True
-            continue
-        if skip_next:
-            skip_next = False
-            continue
-        filtered_args.append(arg)
-    file_list = [f.strip() for f in " ".join(filtered_args).split("\n") if f.strip()]
+    # # Filter out any -name argument and its value
+    # filtered_args = []
+    # skip_next = False
+    # for arg in all_args.split():
+    #     if arg.startswith("-name"):
+    #         skip_next = True
+    #         continue
+    #     if skip_next:
+    #         skip_next = False
+    #         continue
+    #     filtered_args.append(arg)
+    # file_list = [f.strip() for f in " ".join(filtered_args).split("\n") if f.strip()]
 
-    if not file_list:
-        print("No Verilog files found")
-        sys.exit(1)
+    # if not file_list:
+    #     print("No Verilog files found")
+    #     sys.exit(1)
 
-    try:
-        ast, _ = parse(file_list, debug=False)
-    except Exception as e:
-        print(f"Error parsing files: {e}")
-        sys.exit(1)
+    # try:
+    #     ast, _ = s(file_list, debug=False)
+    # except Exception as e:
+    #     print(f"Error parsing files: {e}")
+    #     sys.exit(1)
 
-    declared_signals = set()
-    modules = extract_module_info(ast)
+    # declared_signals = set()
+    # modules = extract_module_info(ast)
     
-    test_filename = args.name
-    for module_name, ports in modules:
-        if test_filename:
-            generate_cocotb_test(module_name, ports, test_filename)
-        else:
-            generate_cocotb_test(module_name, ports, module_name.lower())
+    # test_filename = args.name
+    # for module_name, ports in modules:
+    #     if test_filename:
+    #         generate_cocotb_test(module_name, ports, test_filename)
+    #     else:
+    #         generate_cocotb_test(module_name, ports, module_name.lower())
     
     cleanup_pyverilog_artifacts()

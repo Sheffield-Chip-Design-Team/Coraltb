@@ -91,6 +91,7 @@ def generate_wtb(ast, top_module, inst_name, overide_params=[], param_values=[],
 
         print(f"[DEBUG] WTB written to {mod.name}_wtb.v!")
 
+
 # Main function to parse arguments and call appropriate functions
 def main():
     parser = argparse.ArgumentParser(
