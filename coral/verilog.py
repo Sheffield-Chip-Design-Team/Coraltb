@@ -1,16 +1,14 @@
 # Convenience functions for handling and parsing verilog source files
 from pyverilog.vparser.parser import VerilogCodeParser
-from pyverilog.vparser.ast import ModuleDef, Paramlist, Decl, Parameter, Portlist, Ioport, Identifier, Input, Output, Inout
+from pyverilog.vparser.ast import ModuleDef, Paramlist, Decl, Parameter, Localparam, Portlist, Ioport, Identifier, Input, Output, Inout
 from pyverilog.ast_code_generator.codegen import ASTCodeGenerator
 
-import sys, os , io
+import sys, os 
 
 codegen = ASTCodeGenerator()
 
-# TODO - refactor generate instantiation 
 # TODO - add config option for keeping parameter definitions in instantiations
-# TODO - fix extraction port widths defined by parameters (and overriden parameters)
-# TODO - add support for inout ports
+# TODO - format the signals nicley (consistent end indentation)
 
 def parse_design (filelist, includes, defines):
     """Parse the verilog design files and return (ast, directives)."""
@@ -34,6 +32,43 @@ def parse_design (filelist, includes, defines):
 
     return ast, directives
 
+#  Module Extraction Functions
+
+def get_all_modules(ast) -> dict:
+    """Return a dictionary of all ModuleDef AST nodes in the design."""
+    
+    modules = {}
+
+    for desc in ast.description.definitions:
+        if isinstance(desc, ModuleDef):
+            modules[desc.name] = desc
+    
+    return modules
+
+def get_top_modules(modules, heirarchal, top_modules) -> list:
+    """Return a list of top-level ModuleDef AST nodes in the design."""
+    module_list = []
+    
+    for desc in modules.values():
+        if not heirarchal:
+            if desc.name in top_modules:
+                module_list.append(desc)
+        else:
+            module_list.append(desc)
+
+    return module_list
+
+def extract_module_info(module:ModuleDef, overide_param_names=[], override_param_values=[]):
+    """Extract parameter and port information for the specified top module."""
+   
+    params = create_param_dict(module)
+    overriden_params = override_param_dict(create_param_dict(module), overide_param_names, override_param_values)
+    ports = create_io_port_dict(get_ports(module), params)
+
+    return ports, overriden_params
+
+# Port Extraction Functions
+
 def get_ports(ast):
     """Return a list of port AST nodes."""
     ports = []
@@ -42,10 +77,10 @@ def get_ports(ast):
             # Ports can be Ioport or simple Identifier
             if isinstance(p, Ioport):
                 pname = p.first.name  # e.g. 'clk'
-                print(f"[DEBUG] Found io port {pname}")
+                # print(f"[DEBUG] Found io port {pname}")
             elif isinstance(p, Identifier):
                 pname = p.name
-                print(f"[DEBUG] Found identifier port {pname}")
+                # print(f"[DEBUG] Found identifier port {pname}")
             else:
                 continue
             ports.append(p)
@@ -68,7 +103,7 @@ def create_io_port_dict(ports, params):
 
     return port_dict
 
-def get_port_direction(port):
+def get_port_direction(port): 
     """Return the direction of an Ioport ('input', 'output', 'inout')."""
     if isinstance(port, Ioport):
         # print(f"[DEBUG] Getting direction for port {port.first.name}")
@@ -81,22 +116,107 @@ def get_port_direction(port):
             return "inout"
     return None
 
-def get_port_width(port, params):
+def evaluate_width_expr(expr_str) -> int:
+    """Evaluate a width expression string and return an integer."""
+    try:
+        width = eval(expr_str)
+        return width
+    except Exception as e:
+        print(f"[ERROR] Could not evaluate width expression '{expr_str}': {e}")
+        return 0
+    
+def get_port_width(port, params, keep_params=False):
     """
-    Return integer width of a PyVerilog Input/Output/Inout node.
+    Return integer (msb value) of a PyVerilog Input/Output/Inout node.
     Returns 1 for scalar (no width declared).
     """
+    # TODO find a way to keep the params for manual edits
+
     w = port.first.width
-    if w is None:
-        return 1  # scalar wire
+    if w is None: 
+        # scalar wire
+        return 0
+    else:         
+        # vector wire
+        print(f"DEBUG: port width for {port.first.name} is {codegen.visit(w)}")
+       
+        msb = str(codegen.visit(w.msb))
+        lsb = str(codegen.visit(w.lsb))
+       
+        # replace parameters in msb and lsb
+        lsb_params = []
+        msb_params = []
+        
+        lsb_elaborated = lsb
+        msb_elaborated = msb
 
-    # w.msb and w.lsb are AST nodes (usually IntConst)
-    print(f"DEBUG: port width for {port.first.name} is {codegen.visit(w)}")
+        print(params)
+
+        for p in params:
+            if p in lsb:
+                print(f"DEBUG: replacing lsb param {p} with value {params[p]}")
+                lsb_elaborated = lsb.replace(p, str(params[p]))
+                lsb_params.append(p)
+            if p in msb:
+                print(f"DEBUG: replacing lsb param {p} with value {params[p]}")
+                msb_elaborated = msb.replace(p, str(params[p]))
+                msb_params.append(p)
+
+        print(f"DEBUG: evaluating expression:{lsb_elaborated}")
+        print(f"DEBUG: evaluating expression:{msb_elaborated}")
+
+        lsb_evaluated = evaluate_width_expr(lsb_elaborated)
+        msb_evaluated = evaluate_width_expr(msb_elaborated)
+
+        print(f"DEBUG: port lsb is {codegen.visit(w.lsb)} evaluated to -> {lsb_evaluated}")
+        print(f"DEBUG: port msb is {codegen.visit(w.msb)} evaluated to -> {msb_evaluated}")
+        
+        if not keep_params:
+            width = (msb_evaluated - lsb_evaluated)
+        else:
+            # reconstruct  simplified width expressions using the input params
+            # if parameters were used in msb and lsb, remove it from both sides 
+            for p in lsb_params:
+                if p in msb_params:
+                    print(f"DEBUG: removing common parameter {p} from msb and lsb")
+                    lsb_params.remove(p)
+                    msb_params.remove(p)
+            
+            #  construfct lsb expression
+        
+            #  construct msb expression
+
+            #  put it together
+            width = f"({msb} - {lsb})"
+
+        return width
+
+# Parameter Extraction and Override Functions
+
+def create_param_dict(module:ModuleDef) -> dict:
+    """Return a dict of parameter_name -> default_value_str."""
+
+    body_params = []
+    body_params = get_body_parameters(module)
+
+    header_params = []
+    header_params = get_header_parameters(module)
+
+    params = {}
     
-    # todo: pull out parameters ???
+    for b in body_params:
+        if get_param_type(b) == "parameter":
+            name, value = get_body_param_info(b)
+            # print(f"[DEBUG] Found parameter {name} with default value {value}")
+            params[name] = value
 
-    return 10
-
+    for h in header_params:
+        name, value = get_header_param_info(h)
+        # print(f"[DEBUG] Found parameter {name} with default value {value}")
+        params[name] = value
+    
+    return params
+        
 def get_body_parameters(ast):
     """Return a list of body parameter AST nodes."""
     params = []
@@ -110,6 +230,18 @@ def get_body_parameters(ast):
 
     return params
 
+def get_param_type(param):
+    """Return 'parameter' or 'localparam'.""" 
+    # print(f"[DEBUG] Getting parameter type for {param.name}")
+    if isinstance(param, Localparam):
+        print(f"[DEBUG] {param.name} is a localparam")
+        return "localparam"
+    elif isinstance(param, Parameter):
+        print(f"[DEBUG] {param.name} is a parameter")
+        return "parameter"
+    else:
+        return None
+ 
 def get_body_param_info(param):
     """Return (name, default_value_str)."""
     name = param.name
@@ -140,119 +272,116 @@ def get_header_parameters(ast):
     # header parameters 
     if isinstance(ast.paramlist, Paramlist) and ast.paramlist.params:
         for p in ast.paramlist.params:
-            print(f"[DEBUG] Found header parameter {p.list[0].name}")
+            # print(f"[DEBUG] Found header parameter {p.list[0].name}")
             params.append(p)
 
     return params
 
-def generate_instantiation (ast, top_module, inst_name, overide_params=[], param_values=[], heirarchal=False, keep_params=False):
-    """Generate a verilog instantiation string for a module in the AST."""
+def override_param_dict(params, overide_params, param_values) -> dict:
+    """Override parameters in the params dict with provided values."""
+    if overide_params and param_values:
+        for i in range (len(overide_params)):
+            # print(f"[DEBUG] Overriding parameter {overide_params[i].upper()} with value {param_values[i]}")
+            if overide_params[i].upper() in params or overide_params[i].lower() in params:
+                params[overide_params[i].upper()] = param_values[i]
+            else :
+                print(f"[WARNING] Parameter {overide_params[i]} not found in module, skipping override")
+    return params
 
-    mods = []
+# Code Generation Functions
 
-    for desc in ast.description.definitions:
-        if isinstance(desc, ModuleDef):
-            if not heirarchal:
-                if desc.name == top_module:
-                    mods.append(desc)
-            else:
-                mods.append(desc)
-            print(f"[DEBUG] found module {desc.name}.")
-
-        if (len(mods) == 0 and not heirarchal):
-            print(f"[ERROR] Top module {top_module} not found in design")
-            return
-
-    for mod in mods:
+def instantiate_module(module_name, inst_name, ports, params) -> str:
+    """Generate a verilog instantiation string for a module."""
     
+    # BUILD STRING
+    out = []
+    out.append(" ")
+
+    # declare interface signals
+    out.append(f"module {module_name.lower()}_wtb;")  # blank line
+    out.append(f"\n  // {module_name} instantation signals")
+
+    # net type
+    for name, info in ports.items():
+        decl_str = "  "
+        signal_name = name.upper()
+        # print(f"[DEBUG] Port {signal_name} is a {info[0]}")
+
+        #  direction
+        if (info[0] == "input"):
+            decl_str += (f"reg  ")
+        else:
+            #  outputs, inout or none
+                decl_str += (f"wire ")
+
+        # net width 
+        if info[1] != 0: 
+            decl_str += (f"[{str(info[1])}:0]")
+
+        decl_str += (f" {signal_name};")
+        out.append(decl_str)
+    
+    out.append("")  # blank line
+
+    # module name + parameters
+    if params:
+        out.append(f"  {module_name} #(")
+        for i, c in enumerate(params):
+            comma = "," if i < len(params) - 1 else ""
+            out.append(f"      .{c}({params[c]}){comma}")
+        out.append(f"  ) {inst_name} (")
+    else:
+        out.append(f"{module_name} {inst_name} (")
+
+    # ports
+    for i, c in enumerate(ports):
+        comma = "," if i < len(ports) - 1 else ""
+        out.append(f"      .{c}({c.upper()}){comma}")
+
+    out.append("  );")
+    out.append(f"\nendmodule \n")  
+    output_str = "\n".join(out)
+
+    print("[DEBUG] Generated instantiation! \n")
+    print(f"{output_str}")
+
+    return output_str
+    
+def generate_wtb(ast, top_module, inst_name, overide_params=[], param_values=[], heirarchal=False, keep_params=False, output_dir=None):
+    """Generate a verilog wtb for module(s) in the AST."""
+
+    design_modules = get_all_modules(ast)
+    top_modules = get_top_modules(design_modules, heirarchal, top_module)
+
+    if (len(top_modules) == 0):
+        if heirarchal:
+            print(f"[ERROR] No modules found in design")
+        else:   
+            print(f"[WARNING] Top module {top_module} not found in design")
+        return
+    
+    for mod in top_modules:
+        
         top_str = codegen.visit(mod)
-        print(f"[DEBUG] Parsed module {mod.name}")
+        ports, params = extract_module_info(mod, overide_params, param_values)
+        print(f"[DEBUG] Extracted {ports} ports and {params} parameters from module {mod.name}")
+        # print(f"[DEBUG] Parsed module {mod.name}")
         # print(top_str)
 
-        # PARAMETERS 
+        out = ""
+        out = instantiate_module(mod.name, inst_name, ports, params)
+       
+        with open(f"{mod.name}_wtb.v", "w") as f:
+         f.write("// Auto-generated Verilog Testbench Wrapper - Coraltb \n")
+         f.write(out)
+         f.write(" ")
 
-        # todo refactor this into one function
-        body_params = []
-        body_params = get_body_parameters(mod)
+        print(f"[DEBUG] WTB written to {mod.name}_wtb.v!")
 
-        header_params = []
-        header_params = get_header_parameters(mod)
+def generate_coctb_heartbeat_test():
+    """Generate a cocotb heartbeat sanity test template."""
+    pass
 
-        params = {}
-        
-        for b in body_params:
-            name, value = get_body_param_info(b)
-            print(f"[DEBUG] Found parameter {name} with default value {value}")
-            params[name] = value
-
-        for h in header_params:
-            name, value = get_header_param_info(h)
-            print(f"[DEBUG] Found parameter {name} with default value {value}")
-            params[name] = value
-        
-        # override params
-        if overide_params and param_values:
-            for i in range (len(overide_params)):
-                print(f"[DEBUG] Overriding parameter {overide_params[i].upper()} with value {param_values[i]}")
-                if overide_params[i].upper() in params or overide_params[i].lower() in params:
-                    params[overide_params[i].upper()] = param_values[i]
-                else :
-                    print(f"[WARNING] Parameter {overide_params[i]} not found in module {mod.name}, skipping override")
-
-        # PORTS 
-        ports = {}
-        ports = create_io_port_dict(get_ports(mod), params)
-
-        # BUILD STRING
-        out = []
-
-        # declare interface signals
-        # todo: handle widths and inouts
-
-        # net type
-        for name, info in ports.items():
-            decl_str = ""
-            signal_name = name.upper()
-            print(f"[DEBUG] Port {signal_name} is a {info[0]}")
-
-            #  direction
-            if (info[0] == "input"):
-                decl_str += (f"reg  ")
-            elif (info[0] == "output"): 
-                 decl_str += (f"wire ")
-
-            # net width 
-            if info[1] != 1: 
-                decl_str += (f"[{int(info[1])-1}:0]")
-
-            decl_str += (f" {signal_name};")
-            out.append(decl_str)
-        
-        out.append("")  # blank line
-
-        # module name + parameters
-        if params:
-            out.append(f"{mod.name} #(")
-            for i, c in enumerate(params):
-                comma = "," if i < len(params) - 1 else ""
-                out.append(f"    .{c}({params[c]}){comma}")
-            out.append(f") {inst_name} (")
-        else:
-            out.append(f"{mod.name} {inst_name} (")
-    
-        # ports
-        for i, c in enumerate(ports):
-            comma = "," if i < len(ports) - 1 else ""
-            out.append(f"    .{c}({c.upper()}){comma}")
-
-        out.append(");")
-
-        print("[DEBUG] Generated instantiation! \n")
-
-        # TODO write to file instead of printing
-        print("\n".join(out))
-        print(" ")
-        
 def cleanup_pyverilog_artifacts():
     for junk in ["parser.out", "parsetab.py", "parsetab.pyc"]:
         try:

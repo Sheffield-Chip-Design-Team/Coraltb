@@ -92,7 +92,7 @@ def main():
 
     code_gen_parser.add_argument("--top", "-t", type=str, required=True, help="top module name")
 
-    code_gen_parser.add_argument("--heir", "-H", required=False, default=True,  action="store_true", help="instantiate the module heirarchally")
+    code_gen_parser.add_argument("--heir", "-H", required=False, default=False,  action="store_true", help="instantiate the module heirarchally")
 
     # Parsing the CLEAN command
     clean_parser = subparsers.add_parser(
@@ -118,7 +118,7 @@ def main():
                     param_list.append(pname)
                     param_overrides.append(pvalue)
 
-        verilog.generate_instantiation(ast, args.top , "dut" , param_list , param_overrides, heirarchal=args.heir==True)
+        verilog.generate_wtb(ast, args.top , "dut" , param_list , param_overrides, heirarchal=args.heir==True)
         verilog.cleanup_pyverilog_artifacts()
 
 if __name__ == "__main__":
