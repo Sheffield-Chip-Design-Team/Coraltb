@@ -1,1 +1,0 @@
-from coral.verilog import *

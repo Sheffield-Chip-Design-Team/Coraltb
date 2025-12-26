@@ -1,8 +1,9 @@
 #!/usr/bin/env python3
 import argparse
-from coral.verilog import *
+from coral.common.pyverilog_helpers import *
 
 def generate_cocotb_test(module_name, ports, test_name):
+    
     clk_signal = next((p[2] for p in ports if any(x in p[2].lower() for x in ['clk', 'clock'])), None)
     rst_signal = next((p[2] for p in ports if any(x in p[2].lower() for x in ['rst', 'reset'])), None)
     
@@ -51,6 +52,7 @@ async def test_{sanity_name}_sanity(uut):
     uut._log.info("Test Complete!")
 
 """
+    
     with open(test_file, "w") as f:
         f.write(template)
     return f"# Generated cocotb test template: {test_file}"

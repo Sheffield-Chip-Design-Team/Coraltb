@@ -3,7 +3,8 @@
 
 import sys
 import argparse
-from coral import instantiate, verilog
+from coral import verilog_wtb, python_tb
+from coral.common import pyverilog_helpers
 
 def main():
 
@@ -105,7 +106,7 @@ def main():
     print("[DEBUG]", args)
 
     if args.command == "code-gen":
-        ast, directives = verilog.parse_design(args.src, args.includes, args.defines)
+        ast, directives = pyverilog_helpers.parse_design(args.src, args.includes, args.defines)
         
         param_list = []
         param_overrides = []
@@ -118,8 +119,8 @@ def main():
                     param_list.append(pname)
                     param_overrides.append(pvalue)
 
-        verilog.generate_wtb(ast, args.top , "dut" , param_list , param_overrides, heirarchal=args.heir==True)
-        verilog.cleanup_pyverilog_artifacts()
+        verilog_wtb.generate_wtb(ast, args.top , "dut" , param_list , param_overrides, heirarchal=args.heir==True)
+        pyverilog_helpers.cleanup_pyverilog_artifacts()
 
 if __name__ == "__main__":
     main()
