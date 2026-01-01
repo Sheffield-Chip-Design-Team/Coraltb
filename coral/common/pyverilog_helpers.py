@@ -6,9 +6,7 @@ from pyverilog.ast_code_generator.codegen import ASTCodeGenerator
 import sys, os 
 
 codegen = ASTCodeGenerator()
-
-# TODO - add config option for keeping parameter definitions in instantiations
-# TODO - format the signals nicley (consistent end indentation)
+    
 
 def parse_design (filelist, includes, defines):
     """Parse the verilog design files and return (ast, directives)."""
@@ -61,9 +59,8 @@ def get_top_modules(modules, heirarchal, top_modules) -> list:
 def extract_module_info(module:ModuleDef, overide_param_names=[], override_param_values=[]):
     """Extract parameter and port information for the specified top module."""
    
-    params = create_param_dict(module)
     overriden_params = override_param_dict(create_param_dict(module), overide_param_names, override_param_values)
-    ports = create_io_port_dict(get_ports(module), params)
+    ports            = create_io_port_dict(get_ports(module), overriden_params)
 
     return ports, overriden_params
 
@@ -130,7 +127,6 @@ def get_port_width(port, params, keep_params=False):
     Return integer (msb value) of a PyVerilog Input/Output/Inout node.
     Returns 1 for scalar (no width declared).
     """
-    # TODO find a way to keep the params for manual edits
 
     w = port.first.width
     if w is None: 
@@ -171,6 +167,9 @@ def get_port_width(port, params, keep_params=False):
         print(f"DEBUG: port lsb is {codegen.visit(w.lsb)} evaluated to -> {lsb_evaluated}")
         print(f"DEBUG: port msb is {codegen.visit(w.msb)} evaluated to -> {msb_evaluated}")
         
+        # TODO find a way to keep the param names instead of evaulatung them 
+        # simplify the parameters
+
         if not keep_params:
             width = (msb_evaluated - lsb_evaluated)
         else:
