@@ -3,6 +3,10 @@ from coral.common.pyverilog_helpers import *
 
 # Code Generation Functions
 
+logger = logging.getLogger(__name__)
+
+# TODO - format the signals niceley (consistent end indentation)
+
 def instantiate_module(module_name, inst_name, ports, params) -> str:
     """Generate a verilog instantiation string for a module."""
     
@@ -21,15 +25,15 @@ def instantiate_module(module_name, inst_name, ports, params) -> str:
         # print(f"[DEBUG] Port {signal_name} is a {info[0]}")
 
         #  direction
-        if (info[0] == "input"):
+        if (info['direction'] == "input"):
             decl_str += (f"reg  ")
         else:
             #  outputs, inout or none
                 decl_str += (f"wire ")
 
         # net width 
-        if info[1] != 0: 
-            decl_str += (f"[{str(info[1])}:0]")
+        if info['width'] != 0: 
+            decl_str += (f"[{str(info['width'])}:0]")
 
         decl_str += (f" {signal_name};")
         out.append(decl_str)
@@ -55,12 +59,13 @@ def instantiate_module(module_name, inst_name, ports, params) -> str:
     out.append(f"\nendmodule \n")  
     output_str = "\n".join(out)
 
-    print("[DEBUG] Generated instantiation! \n")
-    print(f"{output_str}")
+
+    logger.debug("Generated instantiation! \n")
+    logger.debug(f"{output_str}")
 
     return output_str
     
-def generate_wtb(ast, top_module, inst_name, overide_params=[], param_values=[], heirarchal=False, keep_params=False, output_dir=None):
+def generate_wtb(ast, top_module, inst_name, overide_params=[], param_values=[], heirarchal=False, keep_params=False, output_dir="tb"):
     """Generate a verilog wtb for module(s) in the AST."""
 
     design_modules = get_all_modules(ast)
@@ -68,31 +73,35 @@ def generate_wtb(ast, top_module, inst_name, overide_params=[], param_values=[],
 
     if (len(top_modules) == 0):
         if heirarchal:
-            print(f"[ERROR] No modules found in design")
+            logger.error(f"No modules found in design")
         else:   
-            print(f"[WARNING] Top module {top_module} not found in design")
+            logger.warning(f"[WARNING] Top module {top_module} not found in design")
         return
     
     for mod in top_modules:
         
-        top_str = codegen.visit(mod)
-        ports, params = extract_module_info(mod, overide_params, param_values)
-        print(f"[DEBUG] Extracted {ports} ports and {params} parameters from module {mod.name}")
-        # print(f"[DEBUG] Parsed module {mod.name}")
+        ports, params = extract_module_info(mod, overide_params, param_values)        
+        
+        # FOR DEBUGGING 
+        logger.debug(f"Parsed module {mod.name}")
+
+        # top_str = codegen.visit(mod)
         # print(top_str)
 
         out = ""
         out = instantiate_module(mod.name, inst_name, ports, params)
-       
-        with open(f"{mod.name}_wtb.v", "w") as f:
-         f.write("// Auto-generated Verilog Testbench Wrapper - Coraltb \n")
-         f.write(out)
-         f.write(" ")
+        
+        os.makedirs(output_dir, exist_ok=True)
 
-        print(f"[DEBUG] WTB written to {mod.name}_wtb.v!")
+        with open(f"{output_dir}/{mod.name}_wtb.v", "w") as f:
+          f.write("// Auto-generated Verilog Testbench Wrapper - Coraltb \n")
+          f.write(out)
+          f.write(" ")
 
+        logger.info(f"WTB written to {mod.name}_wtb.v!")
 
-# Main function to parse arguments and call appropriate functions
+# TODO - example main function to parse arguments and call appropriate functions
+
 def main():
     parser = argparse.ArgumentParser(
         description="CoralTB - A Cocotb-based Testbench Generation and Management Tool"
@@ -104,4 +113,6 @@ def main():
         "code-gen",
         help="Generate a Verilog testbench wrapper for a specified module."
     )
-    
+
+if __name__ == '__main__':
+    main()
