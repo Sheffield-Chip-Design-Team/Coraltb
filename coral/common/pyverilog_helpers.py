@@ -1,27 +1,31 @@
 # Convenience functions for handling and parsing verilog source files
+
+import logging
 from pyverilog.vparser.parser import VerilogCodeParser
 from pyverilog.vparser.ast import ModuleDef, Paramlist, Decl, Parameter, Localparam, Portlist, Ioport, Identifier, Input, Output, Inout
-from pyverilog.ast_code_generator.codegen import ASTCodeGenerator
 
 import sys, os 
+import coral.common.config as cfg
 
-codegen = ASTCodeGenerator()
-    
+logger  = logging.getLogger(__name__)
+codegen = cfg.codegen
 
-def parse_design (filelist, includes, defines):
+def parse_design(filelist, includes, defines):
     """Parse the verilog design files and return (ast, directives)."""
     for f in filelist:
         if not os.path.exists(f):
             raise IOError("file not found: " + f)
         
     if len(filelist) == 0:
-        print("No input files specified")
+        logger.error("No input files specified")
         return None, None
+        
         
     codeparser = VerilogCodeParser(
         filelist,
         preprocess_include=includes,
-        preprocess_define=defines
+        preprocess_define=defines,
+        debug=False        # disable PLY debug prints
     )
     
     # TODO - figure out how to remove the logging here
@@ -74,15 +78,15 @@ def get_ports(ast):
             # Ports can be Ioport or simple Identifier
             if isinstance(p, Ioport):
                 pname = p.first.name  # e.g. 'clk'
-                # print(f"[DEBUG] Found io port {pname}")
+                logging.debug(f"Found io port {pname}")
             elif isinstance(p, Identifier):
                 pname = p.name
-                # print(f"[DEBUG] Found identifier port {pname}")
+                logging.debug(f"Found identifier port {pname}")
             else:
                 continue
             ports.append(p)
     return ports
-    
+
 def create_io_port_dict(ports, params):
     """Return a dict of port_name -> [port direction, port width]."""
     port_dict = {}
@@ -90,9 +94,10 @@ def create_io_port_dict(ports, params):
         # Ports can be Ioport or simple Identifier
         if isinstance(p, Ioport):
             pname = p.first.name    # e.g. 'clk'
-            port_dict[pname] = []
-            port_dict[pname].append(get_port_direction(p))
-            port_dict[pname].append(get_port_width(p, params))
+            port_dict[pname] = {
+                "direction": get_port_direction(p),
+                "width": get_port_width(p, params),
+            }
         elif isinstance(p, Identifier):
             pname = p.name
         else:
@@ -100,10 +105,35 @@ def create_io_port_dict(ports, params):
 
     return port_dict
 
+def find_port(port_dict, keywords):
+    """Return the first port name matching any of the keywords."""
+    return next(
+        (name for name in port_dict if any(k in name.lower() for k in keywords)),
+        None
+    )
+
+def filter_ports_by_direction(ports_dict):
+    """Return a dictionary of ports filtered by direction ('input', 'output', 'inout')."""
+    
+    input_ports  = {}
+    output_ports = {}
+    inout_ports  = {}
+    
+    for name, info in ports_dict.items():
+        direction = info["direction"]
+        if direction == "input":
+            input_ports[name] = info
+        elif direction == "output":
+            output_ports[name] = info
+        elif direction == "inout":
+            inout_ports[name] = info
+
+    return input_ports, output_ports, inout_ports
+
 def get_port_direction(port): 
     """Return the direction of an Ioport ('input', 'output', 'inout')."""
     if isinstance(port, Ioport):
-        # print(f"[DEBUG] Getting direction for port {port.first.name}")
+        logging.debug(f"Getting direction for port {port.first.name}")
         first = port.first
         if isinstance(first, Input):
             return "input"
@@ -116,10 +146,13 @@ def get_port_direction(port):
 def evaluate_width_expr(expr_str) -> int:
     """Evaluate a width expression string and return an integer."""
     try:
-        width = eval(expr_str)
+        if expr_str.isdigit():
+            return int(expr_str)     
+        else:
+            width = eval(expr_str)
         return width
     except Exception as e:
-        print(f"[ERROR] Could not evaluate width expression '{expr_str}': {e}")
+        logging.error(f"Could not evaluate width expression '{expr_str}': {e}")
         return 0
     
 def get_port_width(port, params, keep_params=False):
@@ -134,8 +167,7 @@ def get_port_width(port, params, keep_params=False):
         return 0
     else:         
         # vector wire
-        print(f"DEBUG: port width for {port.first.name} is {codegen.visit(w)}")
-       
+      
         msb = str(codegen.visit(w.msb))
         lsb = str(codegen.visit(w.lsb))
        
@@ -146,38 +178,40 @@ def get_port_width(port, params, keep_params=False):
         lsb_elaborated = lsb
         msb_elaborated = msb
 
-        print(params)
-
         for p in params:
             if p in lsb:
-                print(f"DEBUG: replacing lsb param {p} with value {params[p]}")
+                # logging.debug(f"Replacing lsb param {p} with value {params[p]}")
                 lsb_elaborated = lsb.replace(p, str(params[p]))
                 lsb_params.append(p)
             if p in msb:
-                print(f"DEBUG: replacing lsb param {p} with value {params[p]}")
+                # logging.debug(f"Replacing lsb param {p} with value {params[p]}")
                 msb_elaborated = msb.replace(p, str(params[p]))
                 msb_params.append(p)
 
-        print(f"DEBUG: evaluating expression:{lsb_elaborated}")
-        print(f"DEBUG: evaluating expression:{msb_elaborated}")
+        # logging.debug(f"Evaluating expression:{lsb_elaborated}")
+        # logging.debug(f"Evaluating expression:{msb_elaborated}")
 
         lsb_evaluated = evaluate_width_expr(lsb_elaborated)
         msb_evaluated = evaluate_width_expr(msb_elaborated)
 
-        print(f"DEBUG: port lsb is {codegen.visit(w.lsb)} evaluated to -> {lsb_evaluated}")
-        print(f"DEBUG: port msb is {codegen.visit(w.msb)} evaluated to -> {msb_evaluated}")
+        # logging.debug(f"Port lsb is {codegen.visit(w.lsb)} evaluated to -> {lsb_evaluated}")
+        # logging.debug(f"Port msb is {codegen.visit(w.msb)} evaluated to -> {msb_evaluated}")
         
         # TODO find a way to keep the param names instead of evaulatung them 
         # simplify the parameters
 
         if not keep_params:
             width = (msb_evaluated - lsb_evaluated)
+            logging.debug(f"port width MSB for vector {port.first.name} is {width}")
+
         else:
+            # TODO - keep param names in simplified width expression
+
             # reconstruct  simplified width expressions using the input params
             # if parameters were used in msb and lsb, remove it from both sides 
             for p in lsb_params:
                 if p in msb_params:
-                    print(f"DEBUG: removing common parameter {p} from msb and lsb")
+                    logging.debug(f"Removing common parameter {p} from msb and lsb")
                     lsb_params.remove(p)
                     msb_params.remove(p)
             
@@ -206,12 +240,12 @@ def create_param_dict(module:ModuleDef) -> dict:
     for b in body_params:
         if get_param_type(b) == "parameter":
             name, value = get_body_param_info(b)
-            # print(f"[DEBUG] Found parameter {name} with default value {value}")
+            logging.debug(f"Found parameter {name} with default value {value}")
             params[name] = value
 
     for h in header_params:
         name, value = get_header_param_info(h)
-        # print(f"[DEBUG] Found parameter {name} with default value {value}")
+        logging.debug(f"Found parameter {name} with default value {value}")
         params[name] = value
     
     return params
@@ -231,12 +265,12 @@ def get_body_parameters(ast):
 
 def get_param_type(param):
     """Return 'parameter' or 'localparam'.""" 
-    # print(f"[DEBUG] Getting parameter type for {param.name}")
+    logging.debug(f"Getting parameter type for {param.name}")
     if isinstance(param, Localparam):
-        print(f"[DEBUG] {param.name} is a localparam")
+        logging.debug(f"{param.name} is a localparam")
         return "localparam"
     elif isinstance(param, Parameter):
-        print(f"[DEBUG] {param.name} is a parameter")
+        logging.debug(f"{param.name} is a parameter")
         return "parameter"
     else:
         return None
@@ -271,7 +305,7 @@ def get_header_parameters(ast):
     # header parameters 
     if isinstance(ast.paramlist, Paramlist) and ast.paramlist.params:
         for p in ast.paramlist.params:
-            # print(f"[DEBUG] Found header parameter {p.list[0].name}")
+            logging.debug(f"Found header parameter {p.list[0].name}")
             params.append(p)
 
     return params
@@ -280,11 +314,11 @@ def override_param_dict(params, overide_params, param_values) -> dict:
     """Override parameters in the params dict with provided values."""
     if overide_params and param_values:
         for i in range (len(overide_params)):
-            # print(f"[DEBUG] Overriding parameter {overide_params[i].upper()} with value {param_values[i]}")
+            logging.debug(f"[DEBUG] Overriding parameter {overide_params[i].upper()} with value {param_values[i]}")
             if overide_params[i].upper() in params or overide_params[i].lower() in params:
                 params[overide_params[i].upper()] = param_values[i]
             else :
-                print(f"[WARNING] Parameter {overide_params[i]} not found in module, skipping override")
+                logger.warning(f"Parameter {overide_params[i]} not found in module, skipping override")
     return params
 
 def cleanup_pyverilog_artifacts():
