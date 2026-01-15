@@ -38,10 +38,10 @@ Documentation = "https://your_project_name.readthedocs.io/"
 
 
 [project.scripts]
-coral  = "apps.coral:main"
+coral  = "cli.coral:main"
 
 [tool.setuptools]
-packages = ["coral", "apps"] 
+packages = ["coral", "cli"] 
 
 [tool.black]
 line-length = 88
