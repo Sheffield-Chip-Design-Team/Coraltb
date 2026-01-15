@@ -39,6 +39,7 @@ def generate_cocotb_test(module_name, ports, test_name, output_dir="tb") -> str:
 from random import randint
 from cocotb.triggers import Timer
 
+@cocotb.test()
 async def test_{sanity_name}_combinational(uut):
   # set random input values
 """
@@ -46,7 +47,7 @@ async def test_{sanity_name}_combinational(uut):
 
             max_value = max(2**evaluate_width_expr(str(info['width']))-1,1)
             template += f'  uut.{name}.value = randint(0,{max_value})\n'
-            template += f'  uut._log.info("Setting {name} to {{uut.{name}.value}}")\n\n'
+            template += f'  uut._log.info(f"Setting {name} to {{uut.{name}.value}}")\n\n'
             
         template += f"""  await Timer(randint(1,10), unit="ns")
   

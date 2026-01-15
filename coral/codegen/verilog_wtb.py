@@ -6,6 +6,8 @@ from coral.common.pyverilog_helpers import *
 logger = logging.getLogger(__name__)
 
 # TODO - format the signals niceley (consistent end indentation)
+# TODO - add timescale directive
+# TODO - add control for all caps signals
 
 def instantiate_module(module_name, inst_name, ports, params) -> str:
     """Generate a verilog instantiation string for a module."""
@@ -15,13 +17,14 @@ def instantiate_module(module_name, inst_name, ports, params) -> str:
     out.append(" ")
 
     # declare interface signals
+    out.append(f"`timescale 1ns/1ns \n\n")
     out.append(f"module {module_name.lower()}_wtb;")  # blank line
     out.append(f"\n  // {module_name} instantation signals")
 
     # net type
     for name, info in ports.items():
         decl_str = "  "
-        signal_name = name.upper()
+        signal_name = name
         # print(f"[DEBUG] Port {signal_name} is a {info[0]}")
 
         #  direction
@@ -29,7 +32,7 @@ def instantiate_module(module_name, inst_name, ports, params) -> str:
             decl_str += (f"reg  ")
         else:
             #  outputs, inout or none
-                decl_str += (f"wire ")
+            decl_str += (f"wire ")
 
         # net width 
         if info['width'] != 0: 
@@ -53,7 +56,7 @@ def instantiate_module(module_name, inst_name, ports, params) -> str:
     # ports
     for i, c in enumerate(ports):
         comma = "," if i < len(ports) - 1 else ""
-        out.append(f"      .{c}({c.upper()}){comma}")
+        out.append(f"      .{c}({c}){comma}")
 
     out.append("  );")
     out.append(f"\nendmodule \n")  
@@ -67,6 +70,8 @@ def instantiate_module(module_name, inst_name, ports, params) -> str:
     
 def generate_wtb(ast, top_module, inst_name, overide_params=[], param_values=[], heirarchal=False, keep_params=False, output_dir="tb"):
     """Generate a verilog wtb for module(s) in the AST."""
+
+    # print(f"[DEBUG] Generating WTB for top module: {codegen.visit(ast)}")
 
     design_modules = get_all_modules(ast)
     top_modules = get_top_modules(design_modules, heirarchal, top_module)
