@@ -2,7 +2,8 @@ from pathlib import Path
 from cocotb_tools.runner import get_runner
 import os
 
-def run_simulation(simulator="icarus", wtb_module="test_top", src_dir="", rtl_sources=[], test_module="", test_dir=None, output_dir=None):
+
+def run_simulation(simulator="icarus", wtb_module="test_top", src_dir="", rtl_sources=[], test_module="", test_dir=None, waves=True, coverage=False, output_dir=None):
     """Run a cocotb simulation using the specified simulator."""
 
     sim_build_dir   = (output_dir+"/"+simulator) if output_dir else simulator
@@ -10,8 +11,9 @@ def run_simulation(simulator="icarus", wtb_module="test_top", src_dir="", rtl_so
     if not test_dir:    
         test_module_dir = "/Users/macbook/chip_dev/Coraltb/test/sim_test/tb" # TODO - make this dynamic
 
-    # Enable waveform dumping
-    os.environ["WAVES"] = "1"
+    if waves:
+        # Enable waveform dumping
+        os.environ["WAVES"] = "1"
     
     runner = get_runner(simulator)
 

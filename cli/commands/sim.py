@@ -15,18 +15,30 @@ def register(subparsers):
         help="Run a single test, optionally specifying a specific test. [UNIMPLEMENTED]"
     )
 
-    sim_parser.add_argument("--test", "-t", type=str, default=1,
-                        help="specify the cocotb test to run")
+    sim_parser.add_argument("--config", "-c", type=str, required=False, default=1,
+                        help="specify the test config file ton use")
     
-    sim_parser.add_argument("--filelist", "-f", type=str, default=1,
-                        help="specify the list of source files used in the simulation.")
+    sim_parser.add_argument("--test-module", "-m", type=str, default=1,
+                        help="specify the cocotb test module to run")
     
+    sim_parser.add_argument("--test-dir", "-d", type=str, default="",
+                    help="specify the test directory for the test module")
+    
+    sim_parser.add_argument("--output-dir", "-o", type=str, default="",
+                    help="specify the output directory for the test module")
+
     sim_parser.add_argument("--seed", "-s", type=int,
                         help="Force a specific seed")
     
     sim_parser.add_argument("--runs", "-r", type=int, default=1,
                         help="Number of simulation runs")
     
+    sim_parser.add_argument("--waves", "-w", type=int, default=1,
+                        help="Switch for enabling or disabling waveform generation")
+    
+    sim_parser.add_argument("--cov", "-u", type=int, default=1,
+                        help="Switch for enabling or disabling coverage reportiing")
+
     sim_parser.add_argument("--verbose", "-v", action="count", default=0,
                         help="Set output verbosity level e.g., -v = INFO, -vv - DEBUG")
     
@@ -54,25 +66,39 @@ def discover_sources():
             rel_path = v_file.relative_to(src_dir)
             v_files.append(str(rel_path))
     
-    return v_files
-    return []
+    return v_files, src_dirs[0]
 
 def compile_sources(sources):
     # Placeholder for compilation logic
     pass
 
 def run_sim(args, logger):
-    logger.debug(f"Running Test: {args.test}")
+    logger.debug(f"Running Test: {args.test_module}")
     
-    # TODO find the modules that need to be built and ONLY build those (in parallel)
-    src_files = discover_sources()
+    src_files, src_root_dir = discover_sources()
     print(f"Discovered source files: {src_files}")
+   
+    wtb_name = args.test_module
 
+    output_dir = args.output_dir if args.output_dir else "sim"
+
+    sim.run_simulation(simulator="icarus", 
+        wtb_module=wtb_name, 
+        src_dir=src_root_dir,
+        rtl_sources=src_files, 
+        wtb_module=wtb_name,
+        test_module=args.test_module, 
+        test_dir=args.test_dir, 
+        output_dir=args.output_dir,
+        waves=bool(args.waves),
+        coverage=bool(args.cov)
+    )
+   
+   
+   
     # rtl_sources = []
     # rtl_sources.append("/Users/macbook/chip_dev/Coraltb/test/src/ALU.v")
     # rtl_sources.append("/Users/macbook/chip_dev/Coraltb/test/sim_test/tb/ArithmeticLogicUnit_wtb.v")
    
-    # wtb_name = "arithmeticlogicunit_wtb"
 
-    # sim.run_simulation(simulator="icarus", wtb_module=wtb_name, src_dir="", rtl_sources=rtl_sources, test_module=args.test, test_dir=None, output_dir=None)
 

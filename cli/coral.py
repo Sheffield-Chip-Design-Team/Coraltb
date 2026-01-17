@@ -63,8 +63,11 @@ def main():
 
     # Setup logger
     quiet = args.quiet if "quiet" in args else False
+   
     setup_logging(args.verbose, quiet)
     logger = logging.getLogger(__name__)
+    logger.info(f"Running command: {args.command}")
+    
     args.func(args, logger)
 
 if __name__ == "__main__":
