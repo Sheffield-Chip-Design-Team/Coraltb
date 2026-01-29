@@ -2,6 +2,8 @@ from pathlib import Path
 from cocotb_tools.runner import get_runner
 import os
 
+import logging
+logger = logging.getLogger(__name__)
 
 def run_simulation(simulator="icarus", wtb_module="test_top", src_dir="", rtl_sources=[], test_module="", test_dir=None, waves=True, coverage=False, output_dir=None):
     """Run a cocotb simulation using the specified simulator."""
@@ -15,6 +17,15 @@ def run_simulation(simulator="icarus", wtb_module="test_top", src_dir="", rtl_so
         # Enable waveform dumping
         os.environ["WAVES"] = "1"
     
+    if coverage:
+        if simulator.lower() == "verilator":
+            logger.info("Enabling cocotb user coverage")
+            os.environ["COCOTB_USER_COVERAGE"] = "1"
+        else:
+            logger.warning(
+                f"{simulator} does not support cocotb user coverage. Ignoring --cov. "
+                
+            )
     runner = get_runner(simulator)
 
     for source in rtl_sources:
