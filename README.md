@@ -11,7 +11,7 @@ cd Coraltb
 
 ### 2. Create and activate a virtual environment
 ```
-python -m venv .env
+python3 -m venv .env
 source .env/bin/activate        # Linux / macOS
 ```
 or for Windows...
