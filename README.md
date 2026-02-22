@@ -21,6 +21,7 @@ or for Windows...
 
 ### 3. Install the package as editable
 ```bash
+git switch -b dev
 pip install -e .
 ```
 
