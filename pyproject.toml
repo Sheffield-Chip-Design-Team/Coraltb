@@ -19,6 +19,7 @@ classifiers = [
     "Operating System :: OS Independent",
 ]
 dependencies = [
+    "rich",
     "cocotb>=1.8.3",
     "cocotb-coverage",
     "pytest",
