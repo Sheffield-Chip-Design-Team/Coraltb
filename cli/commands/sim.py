@@ -14,26 +14,26 @@ def register(subparsers):
     
     sim_parser = subparsers.add_parser(
         "sim",
-        help="Run a single test, optionally specifying a specific test. [UNIMPLEMENTED]"
+        help="Run a single test, optionally specifying a specific test. \n example coral sim -dut module_name -x verilator -w -vv"
     )
 
-    sim_parser.add_argument("--config", "-c", type=str, required=False, default=1,
-                        help="specify the test config file ton use")
-    
-    sim_parser.add_argument("-dut", "-d", type=str, default="",
+    sim_parser.add_argument("--dut", "-d", type=str, default="",
                     help="specify the name of the dut wtb module.")
     
-    sim_parser.add_argument("--test-module", "-t", type=str, default=1,
+    sim_parser.add_argument("--test-module", "-t", type=str, default="",
                         help="specify the cocotb test module to run")
+
+    sim_parser.add_argument("--exe", "-x", type=str, default="icarus",
+                        help="specify the simulator to run the test in")
     
     sim_parser.add_argument("--output-dir", "-o", type=str, default="",
                     help="specify the output directory for the test module")
 
     sim_parser.add_argument("--seed", "-s", type=int,
-                        help="Force a specific seed")
+                        help="Force a specific seed [UNIMPLEMENTED]")
     
     sim_parser.add_argument("--runs", "-r", type=int, default=1,
-                        help="Number of simulation runs")
+                        help="Number of simulation runs [UNIMPLEMENTED]")
     
     sim_parser.add_argument("--waves", "-w", default=False,
                         action="store_true",
@@ -41,7 +41,7 @@ def register(subparsers):
     
     sim_parser.add_argument("--cov", "-u", default=False,
                         action="store_true",
-                        help="Switch for enabling or disabling coverage reportiing")
+                        help="Switch for enabling or disabling coverage reportiing [PARTIAL SUPPORT]")
 
     sim_parser.add_argument("--verbose", "-v", action="count", default=0,
                         help="Set output verbosity level e.g., -v = INFO, -vv - DEBUG")
@@ -80,12 +80,18 @@ def discover_sources():
     v_files = []
     for src_dir in src_dirs:
         for v_file in src_dir.rglob('*.v'):
+            
+            # skip iverilog waveform generation hack files 
+            if v_file.name == "cocotb_iverilog_dump.v":
+                continue
+
             # Get relative path from the src directory
             rel_path = v_file.relative_to(current_dir)
             info(f"Discovered Verilog file: {rel_path}")
             v_files.append(str(rel_path))
 
     return v_files, str(current_dir)
+
 def discover_test_module(test_module):
     """Locate cocotb test module and make it importable."""
     current_dir = Path.cwd()
@@ -115,22 +121,30 @@ def compile_sources(sources):
     pass
 
 def run_sim(args, logger):
-    discover_test_module(args.test_module) 
        
     logger.info(f"Running Test: {args.test_module}")
     
     src_files, src_root_dir = discover_sources()
     print(f"Discovered source files: {src_files} in dir {src_root_dir}")
     
-    wtb_name = args.dut
-    output_dir = args.output_dir if args.output_dir else "sim"
+    dut_name = args.dut
+    if not dut_name.endswith("_wtb"):
+        wtb_name = dut_name +"_wtb"
+    else:
+        wtb_name = dut_name
 
+    test_name = args.test_module
+    if not test_name:
+        test_name = "test_"+dut_name
+        discover_test_module(test_name) 
+
+    output_dir = args.output_dir if args.output_dir else "sim"
     
-    sim.run_simulation(simulator="icarus", 
+    sim.run_simulation(simulator=args.exe, 
         wtb_top=wtb_name, 
         src_dir=src_root_dir,
         rtl_sources=src_files, 
-        test_module=args.test_module, 
+        test_module=test_name, 
         output_dir=args.output_dir,
         waves=bool(args.waves),
         coverage=bool(args.cov)
