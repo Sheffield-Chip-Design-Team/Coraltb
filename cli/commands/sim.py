@@ -60,15 +60,14 @@ def discover_sources():
     info(f"Searching for source directories in {current_dir}")
     for root, dirs, files in os.walk(current_dir):
         for dir_name in dirs:
-            if 'src' in dir_name.lower():
+            if 'src' in dir_name.lower() or 'rtl' in dir_name.lower():
                 src_dir = Path(root) / dir_name
                 src_dirs.append(src_dir)
              
-    
     info(f"Searching for wtb files in directory in {current_dir}")
     for root, dirs, files in os.walk(current_dir):
         for dir_name in dirs:
-            if dir_name.lower() == "test":
+            if 'tb' in dir_name.lower():
                 test_dir = Path(root) / dir_name
                 src_dirs.append(test_dir)
               
