@@ -5,7 +5,7 @@ Follow the steps below to clone this repository and install the package in edita
 
 ### 1. Clone the Repository
 ```bash
-git clone [https://github.com/your-username/your-repo.git](https://github.com/Sheffield-Chip-Design-Team/Coraltb.git) Coraltb
+git clone https://github.com/Sheffield-Chip-Design-Team/Coraltb.git Coraltb
 cd Coraltb
 ```
 
