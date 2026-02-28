@@ -16,13 +16,12 @@ def run_simulation(simulator="icarus", wtb_top="wtb", src_dir="", rtl_sources=[]
 
     os.environ["COCOTB_LOG_LEVEL"] = "INFO"      # or DEBUG
 
+    if coverage:
+        os.environ["EXTRA_ARGS"]   = "--coverage"
+
     if waves:
         # Enable waveform dumping
         os.environ["WAVES"] = "1"
-
-    if coverage:
-        # Enable coverage collection
-        os.environ["COCOTB_USER_COVERAGE"] = "1"
     
     runner = get_runner(simulator)
 
@@ -40,6 +39,12 @@ def run_simulation(simulator="icarus", wtb_top="wtb", src_dir="", rtl_sources=[]
     build_args = []
     if simulator == "verilator":
         build_args = ['--Wno-TIMESCALEMOD']
+        if coverage:
+            build_args.append('--coverage')
+            build_args.append('--coverage-line')
+            build_args.append('--coverage-toggle')
+            build_args.append('--coverage-user')
+            build_args.append('--coverage-expr')            
 
     runner.build(
         clean=True,
