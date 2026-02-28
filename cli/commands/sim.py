@@ -152,13 +152,14 @@ def run_sim(args, logger):
 
     # cleanup and generate coverage report if necessary
     build_path = output_dir+"verilator/build/results/"
-    logger.info(f"Cleaning up build directory at {build_path}")
 
     if bool(args.cov):
+        logger.info(f"Collecting coverage information from {build_path}")
         subprocess.run(["verilator_coverage", "--annotate", build_path+"coverage", build_path+"coverage.dat"])
         subprocess.run(["verilator_coverage", "--write-info", build_path+"coverage/coverage.info", build_path+"coverage.dat"])
         subprocess.run(["genhtml", build_path+"coverage/coverage.info", "--output-directory", build_path+"coverage/html"])
-        
+        logger.info(f"Coverage report generated at {build_path}coverage/html")
+
     # rtl_sources = []
     # rtl_sources.append("/Users/macbook/chip_dev/Coraltb/test/src/ALU.v")
     # rtl_sources.append("/Users/macbook/chip_dev/Coraltb/test/sim_test/tb/ArithmeticLogicUnit_wtb.v")
