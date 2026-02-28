@@ -6,6 +6,7 @@ from logging import info
 import os
 from pathlib import Path
 import sys
+import subprocess
 
 import coral.common.config as config
 import coral.run.sim as sim
@@ -26,8 +27,8 @@ def register(subparsers):
     sim_parser.add_argument("--exe", "-x", type=str, default="icarus",
                         help="specify the simulator to run the test in")
     
-    sim_parser.add_argument("--output-dir", "-o", type=str, default="",
-                    help="specify the output directory for the test module")
+    sim_parser.add_argument("--output-dir", "-o", type=str, default=None,
+                    help="specify the output directory for the test module (optional)")
 
     sim_parser.add_argument("--seed", "-s", type=int,
                         help="Force a specific seed [UNIMPLEMENTED]")
@@ -114,23 +115,22 @@ def discover_test_module(test_module):
     info(f"Adding to PYTHONPATH: {test_dir}")
 
     sys.path.insert(0, str(test_dir))
-
-        
+   
 def compile_sources(sources):
     # Placeholder for compilation logic
     pass
 
 def run_sim(args, logger):
-       
     logger.info(f"Running Test: {args.test_module}")
     
     src_files, src_root_dir = discover_sources()
     print(f"Discovered source files: {src_files} in dir {src_root_dir}")
-    
+   
     dut_name = args.dut
     if not dut_name.endswith("_wtb"):
         wtb_name = dut_name +"_wtb"
     else:
+        dut_name.removesuffix("_wtb")
         wtb_name = dut_name
 
     test_name = args.test_module
@@ -149,7 +149,16 @@ def run_sim(args, logger):
         waves=bool(args.waves),
         coverage=bool(args.cov)
     )
-   
+
+    # cleanup and generate coverage report if necessary
+    build_path = output_dir+"verilator/build/results/"
+    logger.info(f"Cleaning up build directory at {build_path}")
+
+    if bool(args.cov):
+        subprocess.run(["verilator_coverage", "--annotate", build_path+"coverage", build_path+"coverage.dat"])
+        subprocess.run(["verilator_coverage", "--write-info", build_path+"coverage/coverage.info", build_path+"coverage.dat"])
+        subprocess.run(["genhtml", build_path+"coverage/coverage.info", "--output-directory", build_path+"coverage/html"])
+        
     # rtl_sources = []
     # rtl_sources.append("/Users/macbook/chip_dev/Coraltb/test/src/ALU.v")
     # rtl_sources.append("/Users/macbook/chip_dev/Coraltb/test/sim_test/tb/ArithmeticLogicUnit_wtb.v")
