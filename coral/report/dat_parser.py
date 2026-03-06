@@ -1,33 +1,18 @@
-from dataclasses import dataclass
-from enum import Enum
 import re
-
-
-class CoverageType(str, Enum):
-    LINE = "line"
-    TOGGLE = "toggle"
-    BRANCH = "branch"
-    EXPR = "expr"
-
-
-@dataclass
-class DataEntry:
-    file: str
-    line: int
-    column: int
-    type: CoverageType
-    page: str
-    object: str
-    hierarchy: str
-    hits: int
+from coral.report.models import CoveragePoint, CoverageType
 
 
 def _parse_coverage_type(value: str) -> CoverageType:
     return CoverageType(value.strip().lower())
 
+
+def _split_path(value: str) -> list[str]:
+    return [part for part in value.strip().split("/") if part]
+
+
 # basically follows verilator dat parser
-def dat_parser(dat_file: str) -> list[DataEntry]:
-    entries: list[DataEntry] = []
+def dat_parser(dat_file: str) -> list[CoveragePoint]:
+    points: list[CoveragePoint] = []
 
     with open(dat_file, "r", encoding="utf-8", errors="replace") as infile:
         for raw_line in infile:
@@ -57,19 +42,19 @@ def dat_parser(dat_file: str) -> list[DataEntry]:
 
 
             try:
-                entry = DataEntry(
+                point = CoveragePoint(
                     file=file_value,
                     line=int(line_value),
                     column=int(column_value),
                     type=_parse_coverage_type(type_value),
-                    page=page_value,
+                    page=_split_path(page_value),
                     object=object_value,
-                    hierarchy=hierarchy_value,
+                    hierarchy=_split_path(hierarchy_value),
                     hits=hits,
                 )
             except ValueError:
                 raise ValueError(f"Invalid line number: {raw_line}")
 
-            entries.append(entry) # add to list
+            points.append(point) # add to list
 
-    return entries
+    return points
