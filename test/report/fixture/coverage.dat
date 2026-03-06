@@ -1,18 +1,32 @@
 # SystemC::Coverage-3
+C 'f/home/verilog_env/works/cocotb-verilator/rtl/sub.vl2n17ttogglepagev_toggle/subocounter[0]:0->1htop.sub*' 20
+C 'f/home/verilog_env/works/cocotb-verilator/rtl/sub.vl2n17ttogglepagev_toggle/subocounter[0]:1->0htop.sub*' 20
+C 'f/home/verilog_env/works/cocotb-verilator/rtl/sub.vl2n17ttogglepagev_toggle/subocounter[1]:0->1htop.sub*' 12
+C 'f/home/verilog_env/works/cocotb-verilator/rtl/sub.vl2n17ttogglepagev_toggle/subocounter[1]:1->0htop.sub*' 10
+C 'f/home/verilog_env/works/cocotb-verilator/rtl/sub.vl2n17ttogglepagev_toggle/subocounter[2]:0->1htop.sub*' 4
+C 'f/home/verilog_env/works/cocotb-verilator/rtl/sub.vl2n17ttogglepagev_toggle/subocounter[2]:1->0htop.sub*' 4
+C 'f/home/verilog_env/works/cocotb-verilator/rtl/sub.vl2n17ttogglepagev_toggle/subocounter[3]:0->1htop.sub*' 4
+C 'f/home/verilog_env/works/cocotb-verilator/rtl/sub.vl2n17ttogglepagev_toggle/subocounter[3]:1->0htop.sub*' 2
+C 'f/home/verilog_env/works/cocotb-verilator/rtl/sub.vl3n17ttogglepagev_toggle/suboresult:0->1htop.sub*' 0
+C 'f/home/verilog_env/works/cocotb-verilator/rtl/sub.vl3n17ttogglepagev_toggle/suboresult:1->0htop.sub*' 0
 C 'f/home/verilog_env/works/cocotb-verilator/rtl/top.vl2n11ttogglepagev_toggle/topoclk:0->1htop' 30
 C 'f/home/verilog_env/works/cocotb-verilator/rtl/top.vl2n11ttogglepagev_toggle/topoclk:1->0htop' 29
+C 'f/home/verilog_env/works/cocotb-verilator/rtl/top.vl20n1tlinepagev_line/topoblockS20htop' 30
+C 'f/home/verilog_env/works/cocotb-verilator/rtl/top.vl21n5tbranchpagev_branch/topoifS21-22htop' 20
+C 'f/home/verilog_env/works/cocotb-verilator/rtl/top.vl21n6tbranchpagev_branch/topoelseS23-24htop' 10
+C 'f/home/verilog_env/works/cocotb-verilator/rtl/top.vl21n9texprpagev_expr/topo(rst==0) => 1htop' 20
+C 'f/home/verilog_env/works/cocotb-verilator/rtl/top.vl21n9texprpagev_expr/topo(rst==1) => 0htop' 10
 C 'f/home/verilog_env/works/cocotb-verilator/rtl/top.vl3n11ttogglepagev_toggle/toporst:0->1htop' 2
 C 'f/home/verilog_env/works/cocotb-verilator/rtl/top.vl3n11ttogglepagev_toggle/toporst:1->0htop' 2
-C 'f/home/verilog_env/works/cocotb-verilator/rtl/top.vl4n22ttogglepagev_toggle/topocounter[0]:0->1htop' 0
-C 'f/home/verilog_env/works/cocotb-verilator/rtl/top.vl4n22ttogglepagev_toggle/topocounter[0]:1->0htop' 0
-C 'f/home/verilog_env/works/cocotb-verilator/rtl/top.vl4n22ttogglepagev_toggle/topocounter[1]:0->1htop' 10
-C 'f/home/verilog_env/works/cocotb-verilator/rtl/top.vl4n22ttogglepagev_toggle/topocounter[1]:1->0htop' 10
-C 'f/home/verilog_env/works/cocotb-verilator/rtl/top.vl4n22ttogglepagev_toggle/topocounter[2]:0->1htop' 6
-C 'f/home/verilog_env/works/cocotb-verilator/rtl/top.vl4n22ttogglepagev_toggle/topocounter[2]:1->0htop' 5
+C 'f/home/verilog_env/works/cocotb-verilator/rtl/top.vl4n22ttogglepagev_toggle/topocounter[0]:0->1htop' 10
+C 'f/home/verilog_env/works/cocotb-verilator/rtl/top.vl4n22ttogglepagev_toggle/topocounter[0]:1->0htop' 10
+C 'f/home/verilog_env/works/cocotb-verilator/rtl/top.vl4n22ttogglepagev_toggle/topocounter[1]:0->1htop' 6
+C 'f/home/verilog_env/works/cocotb-verilator/rtl/top.vl4n22ttogglepagev_toggle/topocounter[1]:1->0htop' 5
+C 'f/home/verilog_env/works/cocotb-verilator/rtl/top.vl4n22ttogglepagev_toggle/topocounter[2]:0->1htop' 2
+C 'f/home/verilog_env/works/cocotb-verilator/rtl/top.vl4n22ttogglepagev_toggle/topocounter[2]:1->0htop' 2
 C 'f/home/verilog_env/works/cocotb-verilator/rtl/top.vl4n22ttogglepagev_toggle/topocounter[3]:0->1htop' 2
-C 'f/home/verilog_env/works/cocotb-verilator/rtl/top.vl4n22ttogglepagev_toggle/topocounter[3]:1->0htop' 2
-C 'f/home/verilog_env/works/cocotb-verilator/rtl/top.vl7n1tlinepagev_line/topoblockS7htop' 30
-C 'f/home/verilog_env/works/cocotb-verilator/rtl/top.vl8n5tbranchpagev_branch/topoifS8-9htop' 20
-C 'f/home/verilog_env/works/cocotb-verilator/rtl/top.vl8n6tbranchpagev_branch/topoelseS10-11htop' 10
-C 'f/home/verilog_env/works/cocotb-verilator/rtl/top.vl8n9texprpagev_expr/topo(rst==0) => 1htop' 20
-C 'f/home/verilog_env/works/cocotb-verilator/rtl/top.vl8n9texprpagev_expr/topo(rst==1) => 0htop' 10
+C 'f/home/verilog_env/works/cocotb-verilator/rtl/top.vl4n22ttogglepagev_toggle/topocounter[3]:1->0htop' 1
+C 'f/home/verilog_env/works/cocotb-verilator/rtl/top.vl5n17ttogglepagev_toggle/toporesult1:0->1htop' 0
+C 'f/home/verilog_env/works/cocotb-verilator/rtl/top.vl5n17ttogglepagev_toggle/toporesult1:1->0htop' 0
+C 'f/home/verilog_env/works/cocotb-verilator/rtl/top.vl6n17ttogglepagev_toggle/toporesult2:0->1htop' 0
+C 'f/home/verilog_env/works/cocotb-verilator/rtl/top.vl6n17ttogglepagev_toggle/toporesult2:1->0htop' 0

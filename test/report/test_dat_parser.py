@@ -5,12 +5,12 @@ from coral.report.dat_parser import dat_parser
 
 def test_dat_parser_reads_fixture_and_prints_results() -> None:
     fixture_path = Path(__file__).parent / "fixture" / "coverage.dat"
-    entries = dat_parser(str(fixture_path))
+    points = dat_parser(str(fixture_path))
 
-    assert entries
-    assert len(entries) == 17
+    assert points
+    assert len(points) == 31
 
-    for entry in entries:
+    for entry in points:
         print(f"file: {entry.file}")
         print(f"line: {entry.line}")
         print(f"column: {entry.column}")
