@@ -50,7 +50,7 @@ target-version = ['py38', 'py39', 'py310', 'py311']
 
 [tool.pytest.ini_options]
 min_version = "6.0"
-addopts = "--strict-markers --strict-positions"
+addopts = "--strict-markers --strict-config"
 testpaths = [
     "test",
 ]
