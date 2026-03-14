@@ -1,6 +1,6 @@
 # Coraltb 
 
-## Cloning and Installing the Coraltb Package (Editable Mode)
+## Cloning and Installing the Coraltb Package
 Follow the steps below to clone this repository and install the package in editable mode for development.
 
 ### 1. Clone the Repository
