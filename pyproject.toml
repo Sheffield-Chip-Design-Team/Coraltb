@@ -38,10 +38,11 @@ Repository = "https://github.com/Sheffield-Chip-Design-Team/Coraltb"
 Documentation = "https://github.com/Sheffield-Chip-Design-Team/Coraltb"
 
 [project.scripts]
-coral  = "cli.coral:main"
+coral  = "coral.cli.coral:main"
 
-[tool.setuptools]
-packages = ["coral", "cli"] 
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["coral*", "cli*"]
 
 [tool.black]
 line-length = 88
