@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "Coraltb"
-version = "0.0.1"
+version = "0.1.0"
 description = "Cocotb-based test creation and simulation running utilities"
 readme = "README.md"
 requires-python = ">=3.12"
@@ -33,10 +33,9 @@ dev = [
 ]
 
 [project.urls]
-Homepage = "https://github.com/your_username/Coraltb"
-Repository = "https://github.com/your_username/your_project_name"
-Documentation = "https://your_project_name.readthedocs.io/"
-
+Homepage = "https://github.com/Sheffield-Chip-Design-Team/Coraltb"
+Repository = "https://github.com/Sheffield-Chip-Design-Team/Coraltb"
+Documentation = "https://github.com/Sheffield-Chip-Design-Team/Coraltb"
 
 [project.scripts]
 coral  = "cli.coral:main"
