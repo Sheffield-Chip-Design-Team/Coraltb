@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "Coraltb"
-version = "0.0.1"
+version = "1.0.0"
 description = "Cocotb-based test creation and simulation running utilities"
 readme = "README.md"
 requires-python = ">=3.12"
@@ -12,15 +12,18 @@ license = { file = "LICENSE" }
 authors = [
     {name = "James Ashie Kotey", email = "jashiekotey1@sheffield.ac.uk" },
 ]
-keywords = ["python", "template", "example"]
+keywords = ["rtl-verification", "automation", "python"]
 classifiers = [
     "Programming Language :: Python :: 3",
     "License :: OSI Approved :: MIT License",
     "Operating System :: OS Independent",
 ]
 dependencies = [
+    "rich",
     "cocotb>=1.8.3",
+    "cocotb-coverage",
     "pytest",
+    "pyverilog"
 ]
 
 [project.optional-dependencies]
@@ -30,12 +33,16 @@ dev = [
 ]
 
 [project.urls]
-Homepage = "https://github.com/your_username/your_project_name"
-Repository = "https://github.com/your_username/your_project_name"
-Documentation = "https://your_project_name.readthedocs.io/"
+Homepage = "https://github.com/Sheffield-Chip-Design-Team/Coraltb"
+Repository = "https://github.com/Sheffield-Chip-Design-Team/Coraltb"
+Documentation = "https://github.com/Sheffield-Chip-Design-Team/Coraltb"
 
-[tool.setuptools]
-packages = ["your_project_name"] # Or find: "src" if using src layout
+[project.scripts]
+coral  = "coral.cli.coral:main"
+
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["coral*", "cli*"]
 
 [tool.black]
 line-length = 88
@@ -45,5 +52,5 @@ target-version = ['py38', 'py39', 'py310', 'py311']
 min_version = "6.0"
 addopts = "--strict-markers --strict-positions"
 testpaths = [
-    "tests",
+    "test",
 ]

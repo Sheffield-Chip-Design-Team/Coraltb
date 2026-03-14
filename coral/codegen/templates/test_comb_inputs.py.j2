@@ -1,0 +1,32 @@
+import cocotb
+from cocotb.triggers import Timer 
+from random import randint
+
+async def set_inputs(uut, ports):
+    for port in ports:
+        if port["direction"] == "input":
+            value = randint(port["range"][0], port["range"][1])
+            uut._log.info(f"Setting {port['name']} to {value}")
+            getattr(uut, port["name"]).value = value
+
+    await ClockCycles(uut.{{ clk_signal }}, 10)
+
+
+@cocotb.test()
+async def test_{{ sanity_name }}_input_randomization(uut):
+    # start clock
+    clock = Clock(uut.{{ clk_signal }}, 40, units="ns")
+    cocotb.start_soon(clock.start())
+
+    await ClockCycles(uut.{{ clk_signal }}, 1)
+
+    # reset the module
+    await reset(uut)
+    await RisingEdge(uut.{{ clk_signal }})
+
+    # set random input values
+    await set_inputs(uut, {{ ports_var_name }})
+
+    # continue test ...
+    await ClockCycles(uut.{{ clk_signal }}, 100)
+    uut._log.info("Test Complete!")
