@@ -1,12 +1,13 @@
 from logging import info
 from pathlib import Path
+from random import randint
 from cocotb_tools.runner import Runner
 import os
 import sys
 
 from cocotb_tools.runner import get_runner
 
-def run_simulation(verbosity=1, simulator="icarus", wtb_top="wtb", src_dir="", rtl_sources=[], test_module="", test_dir=None, waves=True, coverage=False, output_dir=None):
+def run_simulation(seed=None, quiet=False, verbosity=1, simulator="icarus", wtb_top="wtb", src_dir="", rtl_sources=[], test_module="", test_dir=None, waves=True, coverage=False, output_dir=None):
     """Run a cocotb simulation using the specified simulator."""
 
     sim_build_dir = (output_dir+"/"+simulator+"/build") if output_dir else simulator
@@ -14,22 +15,28 @@ def run_simulation(verbosity=1, simulator="icarus", wtb_top="wtb", src_dir="", r
   
     build_path = Path(sim_build_dir)
 
-    if verbosity == 0:
+    # Randomize seed if not provided
+    if seed is None:
+        seed = randint(0, 2**32)
+
+    # Set the logger level based on verbosity and quiet flags
+    if quiet == True:
         os.environ["COCOTB_LOG_LEVEL"] = "ERROR"
     elif verbosity == 1:
         os.environ["COCOTB_LOG_LEVEL"] = "INFO"
     elif verbosity >= 2:    
         os.environ["COCOTB_LOG_LEVEL"] = "DEBUG" 
 
+    # Add verilator coverage flags if coverage is enabled
     if coverage:
         os.environ["EXTRA_ARGS"]   = "--coverage"
 
+    # Enable waveform dumping
     if waves:
-        # Enable waveform dumping
         os.environ["WAVES"] = "1"
     
     runner = get_runner(simulator)
-
+    
     for source in rtl_sources:
         if not os.path.isabs(source):
             source = os.path.join(src_dir, source)
@@ -60,6 +67,7 @@ def run_simulation(verbosity=1, simulator="icarus", wtb_top="wtb", src_dir="", r
     )
 
     runner.test(
+        seed=seed,
         timescale=("1ns", "1ps"),
         waves=waves,
         log_file=f"{test_output_dir}/latest.log",

@@ -15,7 +15,7 @@ def register(subparsers):
     
     sim_parser = subparsers.add_parser(
         "sim",
-        help="Run a single test, optionally specifying a specific test. \n example coral sim -dut module_name -x verilator -w -vv"
+        help="Run a single test module in a cocotb simulation environment."
     )
 
     sim_parser.add_argument("--dut", "-d", type=str, default="",
@@ -25,16 +25,16 @@ def register(subparsers):
                         help="specify the cocotb test module to run")
 
     sim_parser.add_argument("--exe", "-x", type=str, default="icarus",
-                        help="specify the simulator to run the test in")
+                        help="specify the simulator to run the test in (e.g., icarus, verilator, etc.)")
     
     sim_parser.add_argument("--output-dir", "-o", type=str, default=None,
                     help="specify the output directory for the test module (optional)")
 
-    sim_parser.add_argument("--seed", "-s", type=int,
-                        help="Force a specific seed [UNIMPLEMENTED]")
+    sim_parser.add_argument("--seed", "-s", type=int, default=None,
+                        help="Force a specific seed random seed for a test.")
     
     sim_parser.add_argument("--runs", "-r", type=int, default=1,
-                        help="Number of simulation runs [UNIMPLEMENTED]")
+                        help="Number of simulation repeats [UNIMPLEMENTED]")
     
     sim_parser.add_argument("--waves", "-w", default=False,
                         action="store_true",
@@ -42,10 +42,10 @@ def register(subparsers):
     
     sim_parser.add_argument("--cov", "-u", default=False,
                         action="store_true",
-                        help="Switch for enabling or disabling coverage reportiing [PARTIAL SUPPORT]")
+                        help="Switch for enabling or disabling coverage reporting [PARTIAL SUPPORT]")
 
-    sim_parser.add_argument("--verbose", "-v", action="count", default=0,
-                        help="Set output verbosity level e.g., -v = INFO, -vv - DEBUG")
+    sim_parser.add_argument("--verbose", "-v", action="count", default=1,
+                        help="Set output verbosity level e.g., -v = Verbose/Debug Output")
     
     sim_parser.add_argument("--quiet", "-q", required=False, default=False,
                         action="store_true",
@@ -141,6 +141,8 @@ def run_sim(args, logger):
     output_dir = args.output_dir if args.output_dir else "sim"
     
     sim.run_simulation(
+        seed=args.seed,
+        quiet=args.quiet,
         verbosity=args.verbose,
         simulator=args.exe, 
         wtb_top=wtb_name, 
