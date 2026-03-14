@@ -140,7 +140,9 @@ def run_sim(args, logger):
 
     output_dir = args.output_dir if args.output_dir else "sim"
     
-    sim.run_simulation(simulator=args.exe, 
+    sim.run_simulation(
+        verbosity=args.verbose,
+        simulator=args.exe, 
         wtb_top=wtb_name, 
         src_dir=src_root_dir,
         rtl_sources=src_files, 

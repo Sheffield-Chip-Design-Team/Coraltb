@@ -6,7 +6,7 @@ import sys
 
 from cocotb_tools.runner import get_runner
 
-def run_simulation(simulator="icarus", wtb_top="wtb", src_dir="", rtl_sources=[], test_module="", test_dir=None, waves=True, coverage=False, output_dir=None):
+def run_simulation(verbosity=1, simulator="icarus", wtb_top="wtb", src_dir="", rtl_sources=[], test_module="", test_dir=None, waves=True, coverage=False, output_dir=None):
     """Run a cocotb simulation using the specified simulator."""
 
     sim_build_dir = (output_dir+"/"+simulator+"/build") if output_dir else simulator
@@ -14,7 +14,12 @@ def run_simulation(simulator="icarus", wtb_top="wtb", src_dir="", rtl_sources=[]
   
     build_path = Path(sim_build_dir)
 
-    os.environ["COCOTB_LOG_LEVEL"] = "INFO"      # or DEBUG
+    if verbosity == 0:
+        os.environ["COCOTB_LOG_LEVEL"] = "ERROR"
+    elif verbosity == 1:
+        os.environ["COCOTB_LOG_LEVEL"] = "INFO"
+    elif verbosity >= 2:    
+        os.environ["COCOTB_LOG_LEVEL"] = "DEBUG" 
 
     if coverage:
         os.environ["EXTRA_ARGS"]   = "--coverage"
@@ -69,7 +74,8 @@ def run_simulation(simulator="icarus", wtb_top="wtb", src_dir="", rtl_sources=[]
     logfile_path = f"{script_run_from}/{test_output_dir}/latest.log"
     with open(logfile_path, "r") as f:
         for line in f:
-            print(line, end="") 
+            if verbosity > 0:
+                print(line, end="") 
 
     info(f"Simulation completed: see log in {logfile_path}")
 
