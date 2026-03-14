@@ -19,10 +19,9 @@ or for Windows...
 .\.env\Scripts\activate         # Windows
 ```
 
-### 3. Install the package as editable
+### 3. Install the package 
 ```bash
-git switch dev
-pip install -e .
+pip install .
 ```
 
 ### 4 Run the help command
