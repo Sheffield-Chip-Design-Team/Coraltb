@@ -9,9 +9,9 @@ git clone https://github.com/Sheffield-Chip-Design-Team/Coraltb.git Coraltb
 cd Coraltb
 ```
 
-### 2. Create and activate a virtual environment
+### 2. Create or activate the virtual environment you will be accessing coral from
 ```
-python3 -m venv .env
+python3 -m venv .env            # if creating a new enviornment
 source .env/bin/activate        # Linux / macOS
 ```
 or for Windows...
