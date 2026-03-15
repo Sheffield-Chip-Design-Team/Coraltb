@@ -52,7 +52,7 @@ def main():
 
     # Dynamically discover command modules
     for module_info in pkgutil.iter_modules(commands_module.__path__):
-        module_name = f"cli.commands.{module_info.name}"
+        module_name = f"coral.cli.commands.{module_info.name}"
         module = importlib.import_module(module_name)
 
         # convention: module exposes register(subparsers)
