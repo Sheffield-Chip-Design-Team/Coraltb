@@ -6,8 +6,17 @@ def _parse_coverage_type(value: str) -> CoverageType:
     return CoverageType(value.strip().lower())
 
 
-def _split_path(value: str) -> list[str]:
+def _split_page(value: str) -> list[str]:
     return [part for part in value.strip().split("/") if part]
+
+
+def _split_hierarchy(value: str) -> list[str]:
+    parts: list[str] = []
+    for segment in value.strip().split("/"):
+        if not segment:
+            continue
+        parts.extend(part for part in segment.split(".") if part)
+    return parts
 
 
 # basically follows verilator dat parser
@@ -47,9 +56,9 @@ def dat_parser(dat_file: str) -> list[CoveragePoint]:
                     line=int(line_value),
                     column=int(column_value),
                     type=_parse_coverage_type(type_value),
-                    page=_split_path(page_value),
+                    page=_split_page(page_value),
                     object=object_value,
-                    hierarchy=_split_path(hierarchy_value),
+                    hierarchy=_split_hierarchy(hierarchy_value),
                     hits=hits,
                 )
             except ValueError:

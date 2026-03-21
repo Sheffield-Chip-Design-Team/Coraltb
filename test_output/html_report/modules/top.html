@@ -1,0 +1,368 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Coverage Module - top</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 24px;
+      line-height: 1.4;
+    }
+    h1, h2 {
+      margin-bottom: 0.4rem;
+    }
+    table {
+      border-collapse: collapse;
+      width: 100%;
+      margin-bottom: 24px;
+    }
+    th, td {
+      border: 1px solid #ccc;
+      padding: 6px 10px;
+      text-align: left;
+      vertical-align: top;
+    }
+    th {
+      background: #f5f5f5;
+    }
+    .muted {
+      color: #666;
+    }
+    .mono {
+      font-family: Consolas, monospace;
+    }
+    .section {
+      margin-bottom: 28px;
+    }
+    .summary {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(140px, 1fr));
+      gap: 12px;
+      margin-bottom: 24px;
+    }
+    .card {
+      border: 1px solid #ccc;
+      padding: 12px;
+      border-radius: 6px;
+      background: #fafafa;
+    }
+    .breadcrumbs a {
+      text-decoration: none;
+    }
+  </style>
+</head>
+<body>
+
+<div class='breadcrumbs'><a href="../index.html">root</a> / <a href="__root__.html">__root__</a> / <a href="top.html">top</a></div>
+<h1>top</h1>
+<p class="muted">Module report page</p>
+
+<div class="section">
+  <h2>Summary</h2>
+  
+<div class="summary">
+  <div class="card">
+    <strong>Line</strong><br>
+    1/1 (100.0%)
+  </div>
+  <div class="card">
+    <strong>Toggle</strong><br>
+    12/16 (75.0%)
+  </div>
+  <div class="card">
+    <strong>Branch</strong><br>
+    2/2 (100.0%)
+  </div>
+  <div class="card">
+    <strong>Expr</strong><br>
+    2/2 (100.0%)
+  </div>
+</div>
+
+</div>
+
+<div class="section">
+  <h2>Child Modules</h2>
+  
+<table>
+  <thead>
+    <tr>
+      <th>Module</th>
+      <th>Line</th>
+      <th>Toggle</th>
+      <th>Branch</th>
+      <th>Expr</th>
+    </tr>
+  </thead>
+  <tbody>
+    
+<tr>
+  <td><a href="top.sub0.html">top.sub*</a></td>
+  <td>0/0</td>
+  <td>8/10</td>
+  <td>0/0</td>
+  <td>0/0</td>
+</tr>
+
+  </tbody>
+</table>
+
+</div>
+
+<div class="section">
+  <h2>Local Points</h2>
+  
+<table>
+  <thead>
+    <tr>
+      <th>File</th>
+      <th>Line</th>
+      <th>Col</th>
+      <th>Type</th>
+      <th>Object</th>
+      <th>Hits</th>
+      <th>Page</th>
+      <th>Hierarchy</th>
+    </tr>
+  </thead>
+  <tbody>
+    
+<tr>
+  <td class="mono">/home/verilog_env/works/cocotb-verilator/rtl/top.v</td>
+  <td>2</td>
+  <td>11</td>
+  <td>toggle</td>
+  <td class="mono">clk:0-&gt;1</td>
+  <td>30</td>
+  <td class="mono">v_toggle/top</td>
+  <td class="mono">top</td>
+</tr>
+
+<tr>
+  <td class="mono">/home/verilog_env/works/cocotb-verilator/rtl/top.v</td>
+  <td>2</td>
+  <td>11</td>
+  <td>toggle</td>
+  <td class="mono">clk:1-&gt;0</td>
+  <td>29</td>
+  <td class="mono">v_toggle/top</td>
+  <td class="mono">top</td>
+</tr>
+
+<tr>
+  <td class="mono">/home/verilog_env/works/cocotb-verilator/rtl/top.v</td>
+  <td>3</td>
+  <td>11</td>
+  <td>toggle</td>
+  <td class="mono">rst:0-&gt;1</td>
+  <td>2</td>
+  <td class="mono">v_toggle/top</td>
+  <td class="mono">top</td>
+</tr>
+
+<tr>
+  <td class="mono">/home/verilog_env/works/cocotb-verilator/rtl/top.v</td>
+  <td>3</td>
+  <td>11</td>
+  <td>toggle</td>
+  <td class="mono">rst:1-&gt;0</td>
+  <td>2</td>
+  <td class="mono">v_toggle/top</td>
+  <td class="mono">top</td>
+</tr>
+
+<tr>
+  <td class="mono">/home/verilog_env/works/cocotb-verilator/rtl/top.v</td>
+  <td>4</td>
+  <td>22</td>
+  <td>toggle</td>
+  <td class="mono">counter[0]:0-&gt;1</td>
+  <td>10</td>
+  <td class="mono">v_toggle/top</td>
+  <td class="mono">top</td>
+</tr>
+
+<tr>
+  <td class="mono">/home/verilog_env/works/cocotb-verilator/rtl/top.v</td>
+  <td>4</td>
+  <td>22</td>
+  <td>toggle</td>
+  <td class="mono">counter[0]:1-&gt;0</td>
+  <td>10</td>
+  <td class="mono">v_toggle/top</td>
+  <td class="mono">top</td>
+</tr>
+
+<tr>
+  <td class="mono">/home/verilog_env/works/cocotb-verilator/rtl/top.v</td>
+  <td>4</td>
+  <td>22</td>
+  <td>toggle</td>
+  <td class="mono">counter[1]:0-&gt;1</td>
+  <td>6</td>
+  <td class="mono">v_toggle/top</td>
+  <td class="mono">top</td>
+</tr>
+
+<tr>
+  <td class="mono">/home/verilog_env/works/cocotb-verilator/rtl/top.v</td>
+  <td>4</td>
+  <td>22</td>
+  <td>toggle</td>
+  <td class="mono">counter[1]:1-&gt;0</td>
+  <td>5</td>
+  <td class="mono">v_toggle/top</td>
+  <td class="mono">top</td>
+</tr>
+
+<tr>
+  <td class="mono">/home/verilog_env/works/cocotb-verilator/rtl/top.v</td>
+  <td>4</td>
+  <td>22</td>
+  <td>toggle</td>
+  <td class="mono">counter[2]:0-&gt;1</td>
+  <td>2</td>
+  <td class="mono">v_toggle/top</td>
+  <td class="mono">top</td>
+</tr>
+
+<tr>
+  <td class="mono">/home/verilog_env/works/cocotb-verilator/rtl/top.v</td>
+  <td>4</td>
+  <td>22</td>
+  <td>toggle</td>
+  <td class="mono">counter[2]:1-&gt;0</td>
+  <td>2</td>
+  <td class="mono">v_toggle/top</td>
+  <td class="mono">top</td>
+</tr>
+
+<tr>
+  <td class="mono">/home/verilog_env/works/cocotb-verilator/rtl/top.v</td>
+  <td>4</td>
+  <td>22</td>
+  <td>toggle</td>
+  <td class="mono">counter[3]:0-&gt;1</td>
+  <td>2</td>
+  <td class="mono">v_toggle/top</td>
+  <td class="mono">top</td>
+</tr>
+
+<tr>
+  <td class="mono">/home/verilog_env/works/cocotb-verilator/rtl/top.v</td>
+  <td>4</td>
+  <td>22</td>
+  <td>toggle</td>
+  <td class="mono">counter[3]:1-&gt;0</td>
+  <td>1</td>
+  <td class="mono">v_toggle/top</td>
+  <td class="mono">top</td>
+</tr>
+
+<tr>
+  <td class="mono">/home/verilog_env/works/cocotb-verilator/rtl/top.v</td>
+  <td>5</td>
+  <td>17</td>
+  <td>toggle</td>
+  <td class="mono">result1:0-&gt;1</td>
+  <td>0</td>
+  <td class="mono">v_toggle/top</td>
+  <td class="mono">top</td>
+</tr>
+
+<tr>
+  <td class="mono">/home/verilog_env/works/cocotb-verilator/rtl/top.v</td>
+  <td>5</td>
+  <td>17</td>
+  <td>toggle</td>
+  <td class="mono">result1:1-&gt;0</td>
+  <td>0</td>
+  <td class="mono">v_toggle/top</td>
+  <td class="mono">top</td>
+</tr>
+
+<tr>
+  <td class="mono">/home/verilog_env/works/cocotb-verilator/rtl/top.v</td>
+  <td>6</td>
+  <td>17</td>
+  <td>toggle</td>
+  <td class="mono">result2:0-&gt;1</td>
+  <td>0</td>
+  <td class="mono">v_toggle/top</td>
+  <td class="mono">top</td>
+</tr>
+
+<tr>
+  <td class="mono">/home/verilog_env/works/cocotb-verilator/rtl/top.v</td>
+  <td>6</td>
+  <td>17</td>
+  <td>toggle</td>
+  <td class="mono">result2:1-&gt;0</td>
+  <td>0</td>
+  <td class="mono">v_toggle/top</td>
+  <td class="mono">top</td>
+</tr>
+
+<tr>
+  <td class="mono">/home/verilog_env/works/cocotb-verilator/rtl/top.v</td>
+  <td>20</td>
+  <td>1</td>
+  <td>line</td>
+  <td class="mono">block</td>
+  <td>30</td>
+  <td class="mono">v_line/top</td>
+  <td class="mono">top</td>
+</tr>
+
+<tr>
+  <td class="mono">/home/verilog_env/works/cocotb-verilator/rtl/top.v</td>
+  <td>21</td>
+  <td>5</td>
+  <td>branch</td>
+  <td class="mono">if</td>
+  <td>20</td>
+  <td class="mono">v_branch/top</td>
+  <td class="mono">top</td>
+</tr>
+
+<tr>
+  <td class="mono">/home/verilog_env/works/cocotb-verilator/rtl/top.v</td>
+  <td>21</td>
+  <td>6</td>
+  <td>branch</td>
+  <td class="mono">else</td>
+  <td>10</td>
+  <td class="mono">v_branch/top</td>
+  <td class="mono">top</td>
+</tr>
+
+<tr>
+  <td class="mono">/home/verilog_env/works/cocotb-verilator/rtl/top.v</td>
+  <td>21</td>
+  <td>9</td>
+  <td>expr</td>
+  <td class="mono">(rst==0) =&gt; 1</td>
+  <td>20</td>
+  <td class="mono">v_expr/top</td>
+  <td class="mono">top</td>
+</tr>
+
+<tr>
+  <td class="mono">/home/verilog_env/works/cocotb-verilator/rtl/top.v</td>
+  <td>21</td>
+  <td>9</td>
+  <td>expr</td>
+  <td class="mono">(rst==1) =&gt; 0</td>
+  <td>10</td>
+  <td class="mono">v_expr/top</td>
+  <td class="mono">top</td>
+</tr>
+
+  </tbody>
+</table>
+
+</div>
+
+</body>
+</html>

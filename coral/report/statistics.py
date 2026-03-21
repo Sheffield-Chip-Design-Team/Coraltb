@@ -1,16 +1,5 @@
 from coral.report.models import CoverageModule, CoveragePoint, CoverageType
 
-
-def _normalize_hierarchy(raw_hierarchy: list[str]) -> list[str]:
-    parts: list[str] = []
-    for segment in raw_hierarchy:
-        cleaned = segment.strip().rstrip("*")
-        if not cleaned:
-            continue
-        parts.extend([part for part in cleaned.split(".") if part])
-    return parts
-
-
 def _count_point(module: CoverageModule, point: CoveragePoint) -> None:
     if point.type == CoverageType.LINE:
         module.lines_total += 1
@@ -46,7 +35,7 @@ def construct_coverage_hierarchy(points: list[CoveragePoint]) -> CoverageModule:
     modules_by_path: dict[str, CoverageModule] = {"": root}
 
     for point in points:
-        parts = _normalize_hierarchy(point.hierarchy)
+        parts = point.hierarchy
         parent = root
         current_path = ""
 
