@@ -5,10 +5,10 @@ from pyverilog.vparser.parser import VerilogCodeParser
 from pyverilog.vparser.ast import ModuleDef, Paramlist, Decl, Parameter, Localparam, Portlist, Ioport, Identifier, Input, Output, Inout
 
 import sys, os 
-import coral.common.config as cfg
+from pyverilog.ast_code_generator.codegen import ASTCodeGenerator
+codegen = ASTCodeGenerator()
 
 logger  = logging.getLogger(__name__)
-codegen = cfg.codegen
 
 def parse_design(filelist, includes, defines):
     """Parse the verilog design files and return (ast, directives)."""
