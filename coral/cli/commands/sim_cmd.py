@@ -71,26 +71,19 @@ def discover_sources():
             if 'tb' in dir_name.lower():
                 test_dir = Path(root) / dir_name
                 src_dirs.append(test_dir)
-              
 
-    # Remove duplicates while preserving order
-    src_dirs = list(set(src_dirs))
-    info(f"Found source directories: {src_dirs}")
+    current_dir = Path.cwd()
 
-    # Collect all .v files from found src directories
-    v_files = []
-    for src_dir in src_dirs:
-        for v_file in src_dir.rglob('*.v'):
-            
-            # skip iverilog waveform generation hack files 
-            if v_file.name == "cocotb_iverilog_dump.v":
-                continue
+    v_files = [
+        str(f.relative_to(current_dir))
+        for f in current_dir.rglob("*.v")
+        if f.name != "cocotb_iverilog_dump.v"
+    ]
 
-            # Get relative path from the src directory
-            rel_path = v_file.relative_to(current_dir)
-            info(f"Discovered Verilog file: {rel_path}")
-            v_files.append(str(rel_path))
+    for f in v_files:
+        info(f"Discovered Verilog file: {f}")
 
+    return sorted(v_files), str(current_dir)
     return v_files, str(current_dir)
 
 def discover_test_module(test_module):
