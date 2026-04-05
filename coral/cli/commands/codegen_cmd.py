@@ -2,7 +2,6 @@
 # CoralTB Code Generation Command
 
 import logging
-import coral.common.config as config
 from coral.codegen import verilog_wtb
 from coral.codegen import python_tb
 from coral.common import pyverilog_helpers
@@ -13,7 +12,7 @@ def register(subparsers):
     
     code_gen_parser = subparsers.add_parser(
         "code-gen",
-        help="Create a verilog or cocotb testbench from RTL sources. [PARTIALLY IMPLEMENTED]"
+        help="Create a verilog or cocotb testbench from RTL sources."
     )
     
     code_gen_parser.add_argument("--src", "-s", nargs='+', type=str, required=True,
