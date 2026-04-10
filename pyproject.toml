@@ -24,6 +24,7 @@ dependencies = [
     "cocotb-coverage",
     "pytest",
     "pyverilog"
+    "fusesoc>=2.4.5"
 ]
 
 [project.optional-dependencies]
