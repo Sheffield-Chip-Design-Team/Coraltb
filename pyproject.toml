@@ -1,22 +1,16 @@
 [build-system]
-requires = ["setuptools>=61.0", "wheel"]
+requires = ["setuptools>=61.0", "wheel", "setuptools-scm"]
 build-backend = "setuptools.build_meta"
 
 [project]
 name = "Coraltb"
 dynamic = ["version"]
-
-[tool.setuptools_scm]
-version_scheme = "no-guess-dev"
-local_scheme = "no-local-version"
-tag_regex = "^v(?P<version>.*)$"
-
 description = "Cocotb-based test creation and simulation running utilities"
 readme = "README.md"
 requires-python = ">=3.12"
 license = { file = "LICENSE" }
 authors = [
-    {name = "James Ashie Kotey", email = "jashiekotey1@sheffield.ac.uk" },
+    { name = "James Ashie Kotey", email = "jashiekotey1@sheffield.ac.uk" }
 ]
 keywords = ["rtl-verification", "automation", "python"]
 classifiers = [
@@ -45,15 +39,20 @@ Repository = "https://github.com/Sheffield-Chip-Design-Team/Coraltb"
 Documentation = "https://github.com/Sheffield-Chip-Design-Team/Coraltb"
 
 [project.scripts]
-coral  = "coral.cli.coral:main"
+coral = "coral.cli.coral:main"
 
 [tool.setuptools.packages.find]
 where = ["."]
 include = ["coral*", "cli*"]
 
+[tool.setuptools_scm]
+version_scheme = "no-guess-dev"
+local_scheme = "no-local-version"
+tag_regex = "^(v)?(?P<version>\\d+\\.\\d+\\.\\d+)$"
+
 [tool.black]
 line-length = 88
-target-version = ['py38', 'py39', 'py310', 'py311']
+target-version = ["py38", "py39", "py310", "py311"]
 
 [tool.pytest.ini_options]
 min_version = "6.0"
