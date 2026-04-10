@@ -4,7 +4,13 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "Coraltb"
-version = "1.2.0"
+dynamic = ["version"]
+
+[tool.setuptools_scm]
+version_scheme = "no-guess-dev"
+local_scheme = "no-local-version"
+tag_regex = "^v(?P<version>.*)$"
+
 description = "Cocotb-based test creation and simulation running utilities"
 readme = "README.md"
 requires-python = ">=3.12"
