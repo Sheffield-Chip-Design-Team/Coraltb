@@ -37,8 +37,8 @@ jobs:
       id-token: write   # required for trusted publishing
 
     environment:
-      name: testpypi
-      url: https://test.pypi.org/project/YOURPROJECT/
+      name: pypi
+      url: https://test.pypi.org/project/Coraltb
 
     steps:
       - name: Retrieve release distributions
