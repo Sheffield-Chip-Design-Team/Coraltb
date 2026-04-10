@@ -20,7 +20,7 @@ classifiers = [
 ]
 dependencies = [
     "rich",
-    "cocotb>=1.8.3",
+    "cocotb>=1.8.1",
     "cocotb-coverage",
     "pytest",
     "pyverilog",
