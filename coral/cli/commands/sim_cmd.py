@@ -8,7 +8,7 @@ from pathlib import Path
 import sys
 import subprocess
 
-import coral.common.config as config
+import coral.common.config as cfg
 import coral.run.sim as sim
 
 def register(subparsers):
@@ -43,7 +43,10 @@ def register(subparsers):
     sim_parser.add_argument("--cov", "-u", default=False,
                         action="store_true",
                         help="Switch for enabling or disabling coverage reporting [PARTIAL SUPPORT]")
-
+    
+    sim_parser.add_argument("--config", "-c", type=str, default=None,
+                        help="specify the edam config file to use for the simulation (optional)")
+    
     sim_parser.add_argument("--verbose", "-v", action="count", default=1,
                         help="Set output verbosity level e.g., -v = Verbose/Debug Output")
     
@@ -86,16 +89,19 @@ def discover_sources():
     return sorted(v_files), str(current_dir)
     return v_files, str(current_dir)
 
-def discover_test_module(test_module):
+def discover_test_module(test_module, local_mode=True):
     """Locate cocotb test module and make it importable."""
-    current_dir = Path.cwd()
-    test_file = None
+    if local_mode:
+        current_dir = Path.cwd()
+        test_file = None
 
-    for root, dirs, files in os.walk(current_dir):
-        for file in files:
-            if file == f"{test_module}.py":
-                test_file = Path(root) / file
-                break
+        for root, dirs, files in os.walk(current_dir):
+            for file in files:
+                if file == f"{test_module}.py":
+                    test_file = Path(root) / file
+                    break
+    else:
+        test_file = Path(test_module).resolve()
 
     if test_file is None:
         raise FileNotFoundError(
@@ -114,22 +120,39 @@ def compile_sources(sources):
     pass
 
 def run_sim(args, logger):
-    logger.info(f"Running Test: {args.test_module}")
+    if not args.config:
+        logger.info(f"Running Test: {args.test_module}")
+        src_files, src_root_dir = discover_sources()
+        print(f"Discovered source files: {src_files} in dir {src_root_dir}")
     
-    src_files, src_root_dir = discover_sources()
-    print(f"Discovered source files: {src_files} in dir {src_root_dir}")
-   
-    dut_name = args.dut
-    if not dut_name.endswith("_wtb"):
-        wtb_name = dut_name +"_wtb"
-    else:
-        dut_name.removesuffix("_wtb")
-        wtb_name = dut_name
+        logger.info("No config file specified, automatically searching for sources and running simulation.")
+                        
+        dut_name = args.dut
+        if not dut_name.endswith("_wtb"):
+            wtb_name = dut_name +"_wtb"
+        else:
+            dut_name.removesuffix("_wtb")
+            wtb_name = dut_name
 
-    test_name = args.test_module
-    if not test_name:
-        test_name = "test_"+dut_name
-        discover_test_module(test_name) 
+        test_name = args.test_module
+        if not test_name:
+            test_name = "test_"+dut_name
+            discover_test_module(test_name) 
+    else:
+        logger.info(f"Config file specified: {args.config}, loading configuration.")
+        config = cfg.load_edam_to_config(args.config)
+        for test in config.test_files:
+            discover_test_module(test, False)
+        
+        src_root_dir = "."
+        src_files = config.verilog_sources
+        wtb_name = config.toplevel
+        test_name = config.test_module
+        
+        logger.info(f"Running Test: {args.test_module} with DUT: {wtb_name} using simulator: {args.exe}")
+        logger.info(f"Config test files: {src_files}")
+        logger.info(f"Config top-level WTB: {wtb_name}")
+        logger.info(f"Config test module: {test_name}")
 
     output_dir = args.output_dir if args.output_dir else "sim"
     
@@ -156,10 +179,5 @@ def run_sim(args, logger):
         subprocess.run(["verilator_coverage", "--write-info", build_path+"coverage/coverage.info", build_path+"coverage.dat"])
         subprocess.run(["genhtml", build_path+"coverage/coverage.info", "--output-directory", build_path+"coverage/html"])
         logger.info(f"Coverage report generated at {build_path}coverage/html")
-
-    # rtl_sources = []
-    # rtl_sources.append("/Users/macbook/chip_dev/Coraltb/test/src/ALU.v")
-    # rtl_sources.append("/Users/macbook/chip_dev/Coraltb/test/sim_test/tb/ArithmeticLogicUnit_wtb.v")
-   
 
 
