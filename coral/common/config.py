@@ -98,6 +98,18 @@ class SimConfig:
         ]
 
     @property
+    def include_paths(self):
+        base = self.edam_path.parent
+
+        include_dirs = {
+            str((base / f["name"]).resolve().parent)
+            for f in self.edam["files"]
+            if f["file_type"] == "verilogSource" and f.get("is_include", False)
+        }
+
+        return list(include_dirs)
+
+    @property
     def test_files(self):
         base = self.edam_path.parent
         return [

@@ -7,7 +7,7 @@ import sys
 
 from cocotb_tools.runner import get_runner
 
-def run_simulation(seed=None, quiet=False, verbosity=1, simulator="icarus", wtb_top="wtb", src_dir="", rtl_sources=[], test_module="", test_dir=None, waves=True, coverage=False, output_dir=None):
+def run_simulation(seed=None, quiet=False, verbosity=1, simulator="icarus", wtb_top="wtb", src_dir="", rtl_sources=[], inc_dirs=[], test_module="", test_dir=None, waves=True, coverage=False, output_dir=None):
     """Run a cocotb simulation using the specified simulator."""
 
     sim_build_dir = (output_dir+"/"+simulator+"/build") if output_dir else simulator
@@ -60,6 +60,7 @@ def run_simulation(seed=None, quiet=False, verbosity=1, simulator="icarus", wtb_
 
     runner.build(
         clean=True,
+        includes=inc_dirs,
         verilog_sources=rtl_sources,
         hdl_toplevel=wtb_top,
         build_dir=sim_build_dir,
