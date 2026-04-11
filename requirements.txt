@@ -1,0 +1,6 @@
+  rich
+  cocotb>=1.8.1
+  cocotb-coverage
+  pytest
+  pyverilog
+  fusesoc>=2.4.5
