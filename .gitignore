@@ -1,2 +1,3 @@
 *.pyc
 Coraltb.egg-info/*
+build/*
