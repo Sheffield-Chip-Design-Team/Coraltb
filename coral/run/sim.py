@@ -34,6 +34,7 @@ def run_simulation(seed=None, quiet=False, verbosity=1, simulator="icarus", wtb_
     # Enable waveform dumping
     if waves:
         os.environ["WAVES"] = "1"
+        os.environ.get("EXTRA_ARGS", "--trace-fst")
     
     runner = get_runner(simulator)
     
