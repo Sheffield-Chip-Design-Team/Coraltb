@@ -79,8 +79,8 @@ def discover_sources():
 
     v_files = [
         str(f.relative_to(current_dir))
-        for f in current_dir.rglob("*.v")
-        if f.name != "cocotb_iverilog_dump.v"
+        for f in current_dir.rglob("*")
+        if f.suffix.lower() in {".v", ".sv"} and f.name != "cocotb_iverilog_dump.v"
     ]
 
     for f in v_files:
