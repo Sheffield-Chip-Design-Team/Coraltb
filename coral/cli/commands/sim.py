@@ -145,12 +145,13 @@ def run_sim(args, logger):
             discover_test_module(test, False)
         
         src_root_dir = "."
+       
         src_files = config.verilog_sources
-        wtb_name = config.toplevel
+        wtb_name  = config.toplevel
         test_name = config.test_module
         
         logger.info(f"Running Test: {args.test_module} with DUT: {wtb_name} using simulator: {args.exe}")
-        logger.info(f"Config test files: {src_files}")
+        logger.info(f"Config source files: {src_files}")
         logger.info(f"Config top-level WTB: {wtb_name}")
         logger.info(f"Config test module: {test_name}")
 
