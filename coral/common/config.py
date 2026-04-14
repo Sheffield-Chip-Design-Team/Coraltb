@@ -94,7 +94,7 @@ class SimConfig:
         return [
            str((base / f["name"]).resolve())
             for f in self.edam["files"]
-            if f["file_type"] == "verilogSource"
+            if f["file_type"] in ("verilogSource", "systemVerilogSource")
         ]
 
     @property
