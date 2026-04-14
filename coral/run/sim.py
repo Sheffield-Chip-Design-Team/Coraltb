@@ -45,6 +45,7 @@ def run_simulation(seed=None, quiet=False, verbosity=1, simulator="icarus", wtb_
             print(f"[ERROR] Source file {source} does not exist.")
             return
     
+    # TODO - don't always delete the build dir
     import shutil
     if os.path.exists(build_path):
         shutil.rmtree(build_path)
