@@ -7,7 +7,7 @@ import sys
 
 from cocotb_tools.runner import get_runner
 
-def run_simulation(seed=None, quiet=False, verbosity=1, simulator="icarus", wtb_top="wtb", src_dir="", rtl_sources=[], test_module="", test_dir=None, waves=True, coverage=False, output_dir=None):
+def run_simulation(seed=None, quiet=False, verbosity=1, simulator="icarus", wtb_top="wtb", src_dir="", rtl_sources=[], inc_dirs=[], test_module="", test_dir=None, waves=True, coverage=False, output_dir=None):
     """Run a cocotb simulation using the specified simulator."""
 
     sim_build_dir = (output_dir+"/"+simulator+"/build") if output_dir else simulator
@@ -34,6 +34,7 @@ def run_simulation(seed=None, quiet=False, verbosity=1, simulator="icarus", wtb_
     # Enable waveform dumping
     if waves:
         os.environ["WAVES"] = "1"
+        os.environ.get("EXTRA_ARGS", "--trace-fst")
     
     runner = get_runner(simulator)
     
@@ -44,6 +45,7 @@ def run_simulation(seed=None, quiet=False, verbosity=1, simulator="icarus", wtb_
             print(f"[ERROR] Source file {source} does not exist.")
             return
     
+    # TODO - don't always delete the build dir
     import shutil
     if os.path.exists(build_path):
         shutil.rmtree(build_path)
@@ -60,6 +62,7 @@ def run_simulation(seed=None, quiet=False, verbosity=1, simulator="icarus", wtb_
 
     runner.build(
         clean=True,
+        includes=inc_dirs,
         verilog_sources=rtl_sources,
         hdl_toplevel=wtb_top,
         build_dir=sim_build_dir,

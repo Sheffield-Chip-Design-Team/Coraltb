@@ -79,8 +79,10 @@ def discover_sources():
 
     v_files = [
         str(f.relative_to(current_dir))
-        for f in current_dir.rglob("*.v")
-        if f.name != "cocotb_iverilog_dump.v"
+        for f in current_dir.rglob("*")
+        if f.is_file()
+        and f.suffix.lower() in {".v", ".vh"}
+        # and f.name != "cocotb_iverilog_dump.v" FIXME - i'm not sure if this needs to be here or not??
     ]
 
     for f in v_files:
@@ -145,12 +147,14 @@ def run_sim(args, logger):
             discover_test_module(test, False)
         
         src_root_dir = "."
+       
         src_files = config.verilog_sources
-        wtb_name = config.toplevel
+        wtb_name  = config.toplevel
         test_name = config.test_module
+        include_paths = config.include_paths
         
         logger.info(f"Running Test: {args.test_module} with DUT: {wtb_name} using simulator: {args.exe}")
-        logger.info(f"Config test files: {src_files}")
+        logger.info(f"Config source files: {src_files}")
         logger.info(f"Config top-level WTB: {wtb_name}")
         logger.info(f"Config test module: {test_name}")
 
@@ -162,6 +166,7 @@ def run_sim(args, logger):
         verbosity=args.verbose,
         simulator=args.exe, 
         wtb_top=wtb_name, 
+        inc_dirs=include_paths if args.config else [],
         src_dir=src_root_dir,
         rtl_sources=src_files, 
         test_module=test_name, 
